@@ -35,17 +35,15 @@ export function tiersRemaining(board: BoardPlayer[], position: Position): Map<nu
 
 // Rank penalty for injury risk, in "pick slots" — added to overallRank before sorting for
 // recommendations only (the player board itself still shows the true consensus order).
-// Toned down overall — injury risk should be a minor tiebreaker, not a dominant factor. A
-// short, well-defined absence (~4 games or fewer) isn't treated as a real risk at all — no
-// penalty. Beyond that it scales gently: even a real chunk of missed season nudges the pick
-// down rather than burying it. A currently-healthy-but-injury-prone player gets a very small
-// flat nudge instead, since there's no known absence, just history.
-export const SHORT_ABSENCE_GAMES = 4;
+// Per feedback: only a real, season-defining absence is worth caring about — missing more
+// than half of a 17-game season. Anything short of that gets no penalty at all. A currently-
+// healthy-but-injury-prone player ("prone") isn't a real concern either — it's shown as info
+// only, never penalized.
+export const SHORT_ABSENCE_GAMES = 8;
 function injuryPenalty(playerId: string): number {
   const info = INJURY_INFO[playerId];
-  if (!info) return 0;
-  if (info.risk === "long_out") return Math.max(0, info.gamesOut - SHORT_ABSENCE_GAMES) * 6;
-  return 4;
+  if (!info || info.risk !== "long_out") return 0;
+  return Math.max(0, info.gamesOut - SHORT_ABSENCE_GAMES) * 6;
 }
 
 // Rank bonus for red-zone opportunity share — subtracted from overallRank, so a bigger
@@ -219,13 +217,13 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
       }
     }
 
+    // Only a real, season-defining absence gets an active warning here — "prone" (currently
+    // healthy, just history) is shown as passive badge info elsewhere, not flagged as a concern.
     let injuryWarning: string | null = null;
     if (primary) {
       const info = INJURY_INFO[primary.id];
       if (info?.risk === "long_out" && info.gamesOut > SHORT_ABSENCE_GAMES) {
         injuryWarning = `Expected to miss ~${info.gamesOut} games — ${info.note}`;
-      } else if (info?.risk === "prone") {
-        injuryWarning = `Injury history: ${info.note}`;
       }
     }
 

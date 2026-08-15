@@ -519,8 +519,8 @@ button {
   cursor: help;
 }
 .injury-badge.injury-prone {
-  background: rgba(251, 146, 60, 0.15);
-  color: #fb923c;
+  background: var(--panel-2);
+  color: var(--text-dim);
 }
 .injury-badge.injury-minor {
   background: var(--panel-2);
@@ -894,6 +894,48 @@ button {
   width: 100%;
   color: var(--text-dim);
   font-size: 11px;
+}
+
+/* Docked/narrow window (e.g. snapped alongside Sleeper's own draft room) — stay a compact,
+   glanceable single column instead of the wide desktop layout. */
+@media (max-width: 1000px) {
+  .app-header {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .brand .subtitle {
+    display: none;
+  }
+  .app-main {
+    padding: 10px;
+    gap: 14px;
+  }
+  .top-by-pos {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 6px;
+  }
+  .tbp-cell {
+    padding: 6px 8px;
+  }
+  .tbp-team {
+    display: none;
+  }
+  .pick-cards {
+    grid-template-columns: 1fr;
+  }
+  .pick-card {
+    padding: 10px;
+  }
+  .board-row {
+    flex-wrap: wrap;
+    padding: 6px 10px;
+  }
+  .board-row .pos-rank {
+    display: none;
+  }
+  .team-grades {
+    gap: 12px;
+  }
 }
 
 @media (max-width: 720px) {
