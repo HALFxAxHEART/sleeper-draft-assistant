@@ -16,7 +16,7 @@ function Shell() {
     <div className="app-shell">
       <Header onToggleSettings={() => setSettingsOpen((v) => !v)} view={view} onSetView={setView} />
       <div className="app-body">
-        {settingsOpen && <SettingsPanel />}
+        {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
         <main className="app-main">
           {view === "draft" ? (
             <>

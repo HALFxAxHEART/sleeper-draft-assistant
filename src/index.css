@@ -156,6 +156,12 @@ button {
   max-height: calc(100vh - 60px);
 }
 
+.settings-back {
+  margin-bottom: 12px;
+  width: 100%;
+  text-align: left;
+}
+
 .settings-panel h3 {
   font-size: 13px;
   text-transform: uppercase;

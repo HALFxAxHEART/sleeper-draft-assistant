@@ -14,7 +14,7 @@ const ROSTER_FIELDS: Array<{ key: keyof RosterSlots; label: string }> = [
   { key: "BENCH", label: "Bench" },
 ];
 
-export function SettingsPanel() {
+export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const { state, dispatch } = useDraft();
   const { settings } = state;
 
@@ -25,6 +25,10 @@ export function SettingsPanel() {
 
   return (
     <aside className="settings-panel">
+      <button className="btn ghost settings-back" onClick={onClose}>
+        ← Back
+      </button>
+
       <section>
         <h3>League</h3>
         <label className="field">
