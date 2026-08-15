@@ -241,6 +241,31 @@ button {
   min-width: 0;
 }
 
+/* Draft view: two-pane at-a-glance layout — best-by-position + round picks on the left,
+   a persistent master board list on the right that stays put while you scroll picks. */
+.draft-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.draft-left {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.draft-right {
+  flex: 0 0 380px;
+  min-width: 0;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
 /* Top by position */
 .top-by-pos {
   display: grid;
@@ -267,7 +292,8 @@ button {
 .tbp-player {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 4px 6px;
   width: 100%;
   background: transparent;
   border: none;
@@ -286,6 +312,8 @@ button {
 }
 .tbp-name {
   font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 44px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -293,7 +321,6 @@ button {
 .tbp-team {
   font-size: 11px;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 /* Upcoming picks */
@@ -620,11 +647,13 @@ button {
 .board-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  gap: 8px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 10px;
   cursor: pointer;
   text-align: left;
   color: var(--text);
@@ -635,23 +664,29 @@ button {
 }
 .board-row .rank {
   color: var(--text-dim);
-  width: 40px;
+  width: 32px;
   flex-shrink: 0;
+  font-size: 12px;
 }
 .board-row .pname {
   font-weight: 600;
-  min-width: 160px;
+  flex: 1 1 60px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .board-row .pmeta {
   color: var(--text-dim);
-  min-width: 90px;
+  flex-basis: 100%;
+  font-size: 12px;
 }
 .board-row .pmeta.bye-clash {
   color: var(--danger);
   font-weight: 600;
 }
 .board-row .pos-rank {
-  min-width: 40px;
+  display: none;
 }
 .board-row .state-tag {
   margin-left: auto;
@@ -909,9 +944,9 @@ button {
   font-size: 11px;
 }
 
-/* Docked/narrow window (e.g. snapped alongside Sleeper's own draft room) — stay a compact,
-   glanceable single column instead of the wide desktop layout. */
-@media (max-width: 1000px) {
+/* Docked window: tighten up chrome so the two-pane layout stays glanceable without wasted
+   whitespace, well before it needs to stack. */
+@media (max-width: 1100px) {
   .app-header {
     padding: 8px 12px;
     gap: 8px;
@@ -923,8 +958,14 @@ button {
     padding: 10px;
     gap: 14px;
   }
+  .draft-layout {
+    gap: 12px;
+  }
+  .draft-right {
+    flex-basis: 320px;
+  }
   .top-by-pos {
-    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 6px;
   }
   .tbp-cell {
@@ -933,24 +974,28 @@ button {
   .tbp-team {
     display: none;
   }
-  .tbp-player .redzone-badge {
-    display: none;
-  }
-  .pick-cards {
-    grid-template-columns: 1fr;
-  }
   .pick-card {
     padding: 10px;
   }
-  .board-row {
-    flex-wrap: wrap;
-    padding: 6px 10px;
-  }
-  .board-row .pos-rank {
-    display: none;
-  }
   .team-grades {
     gap: 12px;
+  }
+}
+
+/* Below this, the two-pane layout doesn't have room to breathe — stack instead: best-by-
+   position, then round picks, then the master board list, top to bottom. */
+@media (max-width: 860px) {
+  .draft-layout {
+    flex-direction: column;
+  }
+  .draft-right {
+    flex-basis: auto;
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+  .pick-cards {
+    grid-template-columns: 1fr;
   }
 }
 
