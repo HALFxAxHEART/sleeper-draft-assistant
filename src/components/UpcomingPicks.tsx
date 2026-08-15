@@ -23,12 +23,13 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
       <div className="alternates-label">Top {alternates.length + 1} projected available:</div>
       {shown.map((alt) => (
         <button key={alt.id} className="alt-chip" onClick={() => onPick(alt.id)} title="Click to mark as drafted by you instead">
-          <TierBadge tier={alt.tier} /> {alt.name}{" "}
-          <span className="muted">
-            {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
-          </span>
+          <TierBadge tier={alt.tier} />
+          <span className="alt-name">{alt.name}</span>
           <RedZoneBadge player={alt} />
           <InjuryBadge id={alt.id} />
+          <span className="muted alt-meta">
+            {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
+          </span>
         </button>
       ))}
       {hiddenCount > 0 && (

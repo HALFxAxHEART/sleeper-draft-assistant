@@ -369,8 +369,8 @@ button {
 
 .pick-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .pick-card {
@@ -416,6 +416,8 @@ button {
 .pick-primary {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 4px;
   gap: 8px;
   width: 100%;
   background: var(--panel-2);
@@ -435,11 +437,16 @@ button {
 }
 .pick-primary .pname {
   font-weight: 600;
-  flex: 1;
+  flex: 1 1 60px;
+  min-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .pick-primary .pmeta {
   font-size: 12px;
   color: var(--text-dim);
+  flex-basis: 100%;
 }
 
 .scarcity {
@@ -478,6 +485,8 @@ button {
   color: var(--text-dim);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  row-gap: 2px;
   gap: 6px;
   background: transparent;
   border: 1px solid transparent;
@@ -486,6 +495,18 @@ button {
   cursor: pointer;
   text-align: left;
   width: 100%;
+}
+.alt-name {
+  color: var(--text);
+  font-weight: 600;
+  flex: 1 1 50px;
+  min-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.alt-meta {
+  flex-basis: 100%;
 }
 .alt-chip:hover {
   border-color: var(--border);
@@ -557,14 +578,6 @@ button {
   padding: 2px 6px;
   flex-shrink: 0;
   cursor: help;
-}
-.injury-badge.injury-prone {
-  background: var(--panel-2);
-  color: var(--text-dim);
-}
-.injury-badge.injury-minor {
-  background: var(--panel-2);
-  color: var(--text-dim);
 }
 .injury-badge.injury-long {
   background: rgba(244, 63, 94, 0.15);
@@ -944,8 +957,8 @@ button {
   font-size: 11px;
 }
 
-/* Docked window: tighten up chrome so the two-pane layout stays glanceable without wasted
-   whitespace, well before it needs to stack. */
+/* Docked window: tighten up chrome and shrink the round-pick cards so the master list on
+   the right still has room to show, well before it needs to stack. */
 @media (max-width: 1100px) {
   .app-header {
     padding: 8px 12px;
@@ -959,10 +972,10 @@ button {
     gap: 14px;
   }
   .draft-layout {
-    gap: 12px;
+    gap: 10px;
   }
   .draft-right {
-    flex-basis: 320px;
+    flex-basis: 260px;
   }
   .top-by-pos {
     grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
@@ -974,17 +987,31 @@ button {
   .tbp-team {
     display: none;
   }
+  .pick-cards {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 8px;
+  }
   .pick-card {
-    padding: 10px;
+    padding: 8px;
+  }
+  .take-line {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .pick-primary {
+    padding: 8px;
+  }
+  .alternates {
+    margin-top: 6px;
   }
   .team-grades {
     gap: 12px;
   }
 }
 
-/* Below this, the two-pane layout doesn't have room to breathe — stack instead: best-by-
-   position, then round picks, then the master board list, top to bottom. */
-@media (max-width: 860px) {
+/* Below this, even shrunk cards don't have room to breathe next to the master list —
+   stack instead: best-by-position, then round picks, then the master board list. */
+@media (max-width: 600px) {
   .draft-layout {
     flex-direction: column;
   }
