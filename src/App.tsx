@@ -5,19 +5,27 @@ import { Header } from "./components/Header";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { UpcomingPicks } from "./components/UpcomingPicks";
 import { PlayerBoard } from "./components/PlayerBoard";
+import { DraftReview } from "./components/DraftReview";
 
 function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [view, setView] = useState<"draft" | "review">("draft");
   useSleeperSync();
 
   return (
     <div className="app-shell">
-      <Header onToggleSettings={() => setSettingsOpen((v) => !v)} />
+      <Header onToggleSettings={() => setSettingsOpen((v) => !v)} view={view} onSetView={setView} />
       <div className="app-body">
         {settingsOpen && <SettingsPanel />}
         <main className="app-main">
-          <UpcomingPicks />
-          <PlayerBoard />
+          {view === "draft" ? (
+            <>
+              <UpcomingPicks />
+              <PlayerBoard />
+            </>
+          ) : (
+            <DraftReview />
+          )}
         </main>
       </div>
     </div>

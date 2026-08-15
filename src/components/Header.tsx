@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useDraft } from "../state/draftStore";
 
-export function Header({ onToggleSettings }: { onToggleSettings: () => void }) {
+export function Header({
+  onToggleSettings,
+  view,
+  onSetView,
+}: {
+  onToggleSettings: () => void;
+  view: "draft" | "review";
+  onSetView: (v: "draft" | "review") => void;
+}) {
   const { state, dispatch } = useDraft();
   const [draftInput, setDraftInput] = useState(state.settings.sleeperDraftId);
   const [usernameInput, setUsernameInput] = useState(state.settings.sleeperUsername);
@@ -26,6 +34,15 @@ export function Header({ onToggleSettings }: { onToggleSettings: () => void }) {
       <div className="brand">
         <h1>Draft Board</h1>
         <span className="subtitle">Sleeper draft assistant</span>
+      </div>
+
+      <div className="view-tabs">
+        <button className={`tab ${view === "draft" ? "active" : ""}`} onClick={() => onSetView("draft")}>
+          Draft
+        </button>
+        <button className={`tab ${view === "review" ? "active" : ""}`} onClick={() => onSetView("review")}>
+          Review
+        </button>
       </div>
 
       <div className="sleeper-connect">

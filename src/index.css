@@ -60,6 +60,11 @@ button {
   color: var(--text-dim);
 }
 
+.view-tabs {
+  display: flex;
+  gap: 4px;
+}
+
 .sleeper-connect {
   display: flex;
   align-items: center;
@@ -578,6 +583,235 @@ button {
 
 .muted {
   color: var(--text-dim);
+}
+
+/* Draft review */
+.draft-review {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.review-list {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+.review-list-item:hover {
+  border-color: var(--accent);
+}
+.review-list-item.active {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.review-list-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+.review-list-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.review-detail {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.review-detail-head h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.team-grades {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.team-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.team-card.mine {
+  border-color: var(--ok);
+}
+
+.team-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.team-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.you-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ok);
+  background: rgba(52, 211, 153, 0.15);
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.letter-grade {
+  font-size: 18px;
+  font-weight: 800;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.letter-grade.grade-A {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--ok);
+}
+.letter-grade.grade-B {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-2);
+}
+.letter-grade.grade-C {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+}
+.letter-grade.grade-D,
+.letter-grade.grade-F {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--danger);
+}
+.letter-grade.grade-NA {
+  background: var(--panel-2);
+  color: var(--text-dim);
+}
+
+.team-avg {
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.team-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  background: var(--panel-2);
+}
+.team-pick.label-best {
+  border-left-color: var(--ok);
+}
+.team-pick.label-solid {
+  border-left-color: var(--accent);
+}
+.team-pick.label-reach {
+  border-left-color: #fb923c;
+}
+.team-pick.label-bad {
+  border-left-color: var(--danger);
+}
+.team-pick.label-ungraded {
+  border-left-color: var(--border);
+}
+.tp-round {
+  color: var(--text-dim);
+  width: 24px;
+  flex-shrink: 0;
+}
+.tp-name {
+  font-weight: 600;
+  min-width: 110px;
+}
+.tp-label {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.label-tag-best {
+  color: var(--ok);
+  background: rgba(52, 211, 153, 0.15);
+}
+.label-tag-solid {
+  color: var(--accent-2);
+  background: rgba(59, 130, 246, 0.15);
+}
+.label-tag-reach {
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.15);
+}
+.label-tag-bad {
+  color: var(--danger);
+  background: rgba(244, 63, 94, 0.15);
+}
+.label-tag-ungraded {
+  color: var(--text-dim);
+  background: var(--panel);
+}
+.tp-note {
+  width: 100%;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .review-layout {
+    flex-direction: column;
+  }
+  .review-list {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+  }
 }
 
 @media (max-width: 720px) {
