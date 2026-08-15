@@ -34,13 +34,15 @@ export function tiersRemaining(board: BoardPlayer[], position: Position): Map<nu
 
 // Rank penalty for injury risk, in "pick slots" — added to overallRank before sorting for
 // recommendations only (the player board itself still shows the true consensus order).
-// Scaled to how much season the player is actually expected to miss: someone projected back
-// in a game or two barely moves, while a long, uncertain absence (ACL, no timetable) drops
-// them hard. A currently-healthy-but-injury-prone player gets a small flat nudge instead.
+// A short, well-defined absence (~3 games or fewer) isn't treated as a real risk at all —
+// no penalty. Beyond that it scales up fast: missing a real chunk of the season (8-10+
+// games) should meaningfully tank the pick, not just nudge it. A currently-healthy-but-
+// injury-prone player gets a small flat nudge instead, since there's no known absence.
+const SHORT_ABSENCE_GAMES = 3;
 function injuryPenalty(playerId: string): number {
   const info = INJURY_INFO[playerId];
   if (!info) return 0;
-  if (info.risk === "long_out") return info.gamesOut * 7;
+  if (info.risk === "long_out") return Math.max(0, info.gamesOut - SHORT_ABSENCE_GAMES) * 12;
   return 10;
 }
 
@@ -128,9 +130,20 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     }
 
     const desiredSlot = settings.strategy[round - 1] ?? "BEST";
-    const matching = ranked.filter((p) => slotMatches(desiredSlot, p.position));
-    const primary = matching[0] ?? ranked[0] ?? null;
-    const alternates = ranked.filter((p) => p.id !== primary?.id).slice(0, 9);
+
+    // "BEST" is pure value with no positional target, but a 2nd/3rd QB has near-zero
+    // standalone value in a single-QB league once your starter is rostered — unlike RB/WR/TE,
+    // which stay useful as bench/flex depth. So once the QB slot is filled, don't let a QB
+    // outrank a genuinely useful RB/WR/TE just because it edges them on pure consensus rank.
+    // An explicit strategy pick of "QB" for a round still overrides this — only the auto
+    // "BEST" heuristic is affected.
+    const myQBCount = myPlayers.filter((p) => p.position === "QB").length;
+    const qbSaturated = desiredSlot === "BEST" && myQBCount >= settings.roster.QB;
+    const candidates = qbSaturated && ranked.some((p) => p.position !== "QB") ? ranked.filter((p) => p.position !== "QB") : ranked;
+
+    const matching = candidates.filter((p) => slotMatches(desiredSlot, p.position));
+    const primary = matching[0] ?? candidates[0] ?? null;
+    const alternates = candidates.filter((p) => p.id !== primary?.id).slice(0, 9);
 
     let scarcityWarning: string | null = null;
     if (primary && desiredSlot !== "BEST") {
@@ -158,7 +171,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     let injuryWarning: string | null = null;
     if (primary) {
       const info = INJURY_INFO[primary.id];
-      if (info?.risk === "long_out") {
+      if (info?.risk === "long_out" && info.gamesOut > SHORT_ABSENCE_GAMES) {
         injuryWarning = `Expected to miss ~${info.gamesOut} games — ${info.note}`;
       } else if (info?.risk === "prone") {
         injuryWarning = `Injury history: ${info.note}`;

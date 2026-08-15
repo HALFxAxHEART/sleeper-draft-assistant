@@ -467,6 +467,10 @@ button {
   background: rgba(251, 146, 60, 0.15);
   color: #fb923c;
 }
+.injury-badge.injury-minor {
+  background: var(--panel-2);
+  color: var(--text-dim);
+}
 .injury-badge.injury-long {
   background: rgba(244, 63, 94, 0.15);
   color: var(--danger);
