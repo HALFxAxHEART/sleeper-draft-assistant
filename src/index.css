@@ -343,6 +343,31 @@ button {
   flex-shrink: 0;
 }
 
+/* SOS badge */
+.sos-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 6px;
+  flex-shrink: 0;
+  cursor: help;
+}
+.sos-badge.sos-easy {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--ok);
+}
+.sos-badge.sos-medium {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+}
+.sos-badge.sos-hard {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--danger);
+}
+
 /* Player board */
 .board-toolbar {
   display: flex;

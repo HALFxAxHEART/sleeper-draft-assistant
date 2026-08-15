@@ -4,6 +4,7 @@ import { PLAYERS } from "../data/players";
 import { buildBoard, recommendForRound } from "../lib/recommend";
 import { overallPickForRound, totalRounds } from "../lib/types";
 import { TierBadge } from "./TierBadge";
+import { SOSBadge } from "./SOSBadge";
 
 const LOOKAHEAD = 4;
 
@@ -44,6 +45,7 @@ export function UpcomingPicks() {
                   <span className="pmeta">
                     {rec.primary.position} · {rec.primary.team}
                   </span>
+                  <SOSBadge team={rec.primary.team} />
                 </button>
               ) : (
                 <div className="pick-primary empty">No players left</div>
