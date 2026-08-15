@@ -4,7 +4,8 @@ import { fetchDraft, fetchPicks, fetchUserId, parseDraftId, type SleeperPick } f
 import { normalizeName } from "../lib/match";
 import { useDraft } from "../state/draftStore";
 
-const POLL_MS = 4000;
+const POLL_MS = 2000;
+const DRAFT_META_EVERY = 5; // draft metadata (teams/slot) rarely changes mid-draft, so refresh it less often than picks
 
 const NAME_INDEX = new Map<string, string>(); // normalized name (+DEF variant) -> player id
 for (const p of PLAYERS) {
@@ -29,6 +30,8 @@ export function useSleeperSync() {
     if (!sleeperDraftId) return;
     let cancelled = false;
     let userLookupDone = false;
+    let pollCount = 0;
+    let lastTeams: number | undefined;
 
     async function poll() {
       dispatch({ type: "SLEEPER_STATUS", status: state.sleeperStatus === "connected" ? "connected" : "syncing" });
@@ -41,10 +44,16 @@ export function useSleeperSync() {
           myUserIdRef.current = uid;
         }
 
-        const draft = await fetchDraft(draftId);
-        if (myUserIdRef.current && draft.draft_order && draft.draft_order[myUserIdRef.current]) {
-          mySlotRef.current = draft.draft_order[myUserIdRef.current];
+        // Draft metadata (teams/slot order) rarely changes mid-draft — refresh it
+        // less often than picks so pick-syncing itself can poll faster.
+        if (pollCount % DRAFT_META_EVERY === 0 || mySlotRef.current == null) {
+          const draft = await fetchDraft(draftId);
+          if (myUserIdRef.current && draft.draft_order && draft.draft_order[myUserIdRef.current]) {
+            mySlotRef.current = draft.draft_order[myUserIdRef.current];
+          }
+          lastTeams = draft.settings?.teams;
         }
+        pollCount++;
 
         const picks = await fetchPicks(draftId);
         if (cancelled) return;
@@ -62,7 +71,7 @@ export function useSleeperSync() {
         dispatch({
           type: "SLEEPER_MERGE",
           picks: merged,
-          teams: draft.settings?.teams,
+          teams: lastTeams,
           slot: mySlotRef.current ?? undefined,
         });
       } catch (err) {
