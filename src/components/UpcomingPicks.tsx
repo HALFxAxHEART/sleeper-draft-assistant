@@ -5,6 +5,7 @@ import { buildBoard, recommendAllRounds } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
 import { InjuryBadge } from "./InjuryBadge";
+import { RedZoneBadge } from "./RedZoneBadge";
 import { ByeSummary } from "./ByeSummary";
 import { TEAM_CONTEXT } from "../data/teams";
 
@@ -45,6 +46,7 @@ export function UpcomingPicks() {
                   {rec.primary.position} · {rec.primary.team} · Bye {TEAM_CONTEXT[rec.primary.team]?.bye ?? "?"}
                 </span>
                 <SOSBadge team={rec.primary.team} />
+                <RedZoneBadge player={rec.primary} />
                 <InjuryBadge id={rec.primary.id} />
               </button>
             ) : (
@@ -67,6 +69,7 @@ export function UpcomingPicks() {
                     <span className="muted">
                       {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
                     </span>
+                    <RedZoneBadge player={alt} />
                     <InjuryBadge id={alt.id} />
                   </button>
                 ))}

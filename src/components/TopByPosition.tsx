@@ -3,6 +3,7 @@ import { useDraft } from "../state/draftStore";
 import { PLAYERS } from "../data/players";
 import { buildBoard, topAvailableByPosition } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
+import { RedZoneBadge } from "./RedZoneBadge";
 
 export function TopByPosition() {
   const { state, dispatch } = useDraft();
@@ -22,6 +23,7 @@ export function TopByPosition() {
             >
               <TierBadge tier={e.player.tier} />
               <span className="tbp-name">{e.player.name}</span>
+              <RedZoneBadge player={e.player} />
               <span className="tbp-team muted">{e.player.team}</span>
             </button>
           ) : (

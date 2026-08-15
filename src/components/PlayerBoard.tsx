@@ -5,6 +5,7 @@ import { buildBoard, myByeCounts, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
 import { InjuryBadge } from "./InjuryBadge";
+import { RedZoneBadge } from "./RedZoneBadge";
 import { TEAM_CONTEXT } from "../data/teams";
 
 const TABS: Array<Position | "ALL"> = ["ALL", "QB", "RB", "WR", "TE", "K", "DST"];
@@ -64,6 +65,7 @@ export function PlayerBoard() {
               {p.positionRank}
             </span>
             <SOSBadge team={p.team} />
+            <RedZoneBadge player={p} />
             <InjuryBadge id={p.id} />
             <span className={`state-tag ${p.state}`}>{p.state === "available" ? "" : p.state === "mine" ? "MINE" : "picked"}</span>
           </button>

@@ -3,6 +3,7 @@ import type { DraftSettings, PickState, StrategySlot } from "./types";
 import { overallPickForRound, roundForOverallPick, totalRounds } from "./types";
 import { TEAM_CONTEXT } from "../data/teams";
 import { INJURY_INFO } from "../data/injuries";
+import { RED_ZONE_SHARE } from "../data/redzone";
 
 export interface BoardPlayer extends Player {
   overallRank: number;
@@ -47,8 +48,31 @@ function injuryPenalty(playerId: string): number {
   return 4;
 }
 
+// Rank bonus for red-zone opportunity share — subtracted from overallRank, so a bigger
+// share moves a player UP the recommendation order. "Average" usage for the position is a
+// wash; only real red-zone hogs get boosted, scaled per-position since RB touch shares run
+// much higher than WR/TE target shares by nature (a 55% RB share and a 22% WR share can both
+// mean "clear #1 in the offense"). Capped so it nudges, not overrides, the underlying tier.
+const REDZONE_BASELINE: Partial<Record<Position, number>> = { RB: 40, WR: 16, TE: 13 };
+const REDZONE_MULTIPLIER: Partial<Record<Position, number>> = { RB: 0.6, WR: 1.3, TE: 1.5 };
+const REDZONE_CAP = 20;
+function redZoneBonus(p: BoardPlayer): number {
+  const info = RED_ZONE_SHARE[p.id];
+  const baseline = REDZONE_BASELINE[p.position];
+  const multiplier = REDZONE_MULTIPLIER[p.position];
+  if (!info || baseline == null || multiplier == null) return 0;
+  return Math.min(REDZONE_CAP, Math.max(0, info.pct - baseline) * multiplier);
+}
+
 export function effectiveRank(p: BoardPlayer): number {
-  return p.overallRank + injuryPenalty(p.id);
+  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p);
+}
+
+export function redZoneBadgeInfo(p: BoardPlayer): { pct: number; note: string; standout: boolean } | null {
+  const info = RED_ZONE_SHARE[p.id];
+  if (!info) return null;
+  const baseline = REDZONE_BASELINE[p.position] ?? 0;
+  return { pct: info.pct, note: info.note, standout: info.pct - baseline >= 10 };
 }
 
 export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
