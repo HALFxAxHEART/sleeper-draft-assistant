@@ -34,23 +34,24 @@ export function tiersRemaining(board: BoardPlayer[], position: Position): Map<nu
 
 // Rank penalty for injury risk, in "pick slots" — added to overallRank before sorting for
 // recommendations only (the player board itself still shows the true consensus order).
-// A short, well-defined absence (~3 games or fewer) isn't treated as a real risk at all —
-// no penalty. Beyond that it scales up fast: missing a real chunk of the season (8-10+
-// games) should meaningfully tank the pick, not just nudge it. A currently-healthy-but-
-// injury-prone player gets a small flat nudge instead, since there's no known absence.
-const SHORT_ABSENCE_GAMES = 3;
+// Toned down overall — injury risk should be a minor tiebreaker, not a dominant factor. A
+// short, well-defined absence (~4 games or fewer) isn't treated as a real risk at all — no
+// penalty. Beyond that it scales gently: even a real chunk of missed season nudges the pick
+// down rather than burying it. A currently-healthy-but-injury-prone player gets a very small
+// flat nudge instead, since there's no known absence, just history.
+export const SHORT_ABSENCE_GAMES = 4;
 function injuryPenalty(playerId: string): number {
   const info = INJURY_INFO[playerId];
   if (!info) return 0;
-  if (info.risk === "long_out") return Math.max(0, info.gamesOut - SHORT_ABSENCE_GAMES) * 12;
-  return 10;
+  if (info.risk === "long_out") return Math.max(0, info.gamesOut - SHORT_ABSENCE_GAMES) * 6;
+  return 4;
 }
 
-function effectiveRank(p: BoardPlayer): number {
+export function effectiveRank(p: BoardPlayer): number {
   return p.overallRank + injuryPenalty(p.id);
 }
 
-function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
+export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
   return [...players].sort((a, b) => effectiveRank(a) - effectiveRank(b));
 }
 
@@ -79,6 +80,25 @@ export function myByeCounts(board: BoardPlayer[]): Map<number, number> {
     counts.set(bye, (counts.get(bye) ?? 0) + 1);
   }
   return counts;
+}
+
+export interface TopByPositionEntry {
+  label: string;
+  player: BoardPlayer | null;
+}
+
+// Best available player at each position right now, independent of round/strategy — a
+// quick "who's the best X left" reference regardless of what you're actually targeting.
+export function topAvailableByPosition(board: BoardPlayer[]): TopByPositionEntry[] {
+  const ranked = byEffectiveRank(board.filter((p) => p.state === "available"));
+  const positions: Position[] = ["QB", "RB", "WR", "TE", "K", "DST"];
+  const entries: TopByPositionEntry[] = positions.map((pos) => ({
+    label: pos,
+    player: ranked.find((p) => p.position === pos) ?? null,
+  }));
+  const flexPlayer = ranked.find((p) => p.position === "RB" || p.position === "WR" || p.position === "TE") ?? null;
+  entries.splice(4, 0, { label: "FLEX", player: flexPlayer });
+  return entries;
 }
 
 export interface RoundRecommendation {
@@ -143,7 +163,14 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
 
     const matching = candidates.filter((p) => slotMatches(desiredSlot, p.position));
     const primary = matching[0] ?? candidates[0] ?? null;
-    const alternates = candidates.filter((p) => p.id !== primary?.id).slice(0, 9);
+
+    // Show every remaining player in the same tier as the pick first (so if there are still
+    // 5 Tier-1 guys on the board, you see all 5, not just however many happen to fit in a
+    // fixed top-N cut), then fill out to a reasonable total with the next-best players.
+    const rest = candidates.filter((p) => p.id !== primary?.id);
+    const sameTier = primary ? rest.filter((p) => p.tier === primary.tier) : [];
+    const nextBest = primary ? rest.filter((p) => p.tier !== primary.tier) : rest;
+    const alternates = [...sameTier, ...nextBest].slice(0, 14);
 
     let scarcityWarning: string | null = null;
     if (primary && desiredSlot !== "BEST") {

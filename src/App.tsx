@@ -6,6 +6,7 @@ import { SettingsPanel } from "./components/SettingsPanel";
 import { UpcomingPicks } from "./components/UpcomingPicks";
 import { PlayerBoard } from "./components/PlayerBoard";
 import { DraftReview } from "./components/DraftReview";
+import { TopByPosition } from "./components/TopByPosition";
 
 function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -20,6 +21,7 @@ function Shell() {
         <main className="app-main">
           {view === "draft" ? (
             <>
+              <TopByPosition />
               <UpcomingPicks />
               <PlayerBoard />
             </>

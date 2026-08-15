@@ -241,6 +241,61 @@ button {
   min-width: 0;
 }
 
+/* Top by position */
+.top-by-pos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.tbp-cell {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.tbp-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.tbp-player {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-size: 13px;
+}
+.tbp-player:hover .tbp-name {
+  color: var(--accent-2);
+}
+.tbp-player.empty {
+  color: var(--text-dim);
+  cursor: default;
+}
+.tbp-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tbp-team {
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 /* Upcoming picks */
 .upcoming-picks-head {
   display: flex;
