@@ -11,7 +11,7 @@ export interface Player {
   tier: number;
 }
 
-function id(name: string, position: string) {
+export function playerId(name: string, position: string) {
   return `${name}-${position}`.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
@@ -188,7 +188,7 @@ const RAW: Array<[string, Position, string, number]> = [
 ];
 
 export const PLAYERS: Player[] = RAW.map(([name, position, team, tier]) => ({
-  id: id(name, position),
+  id: playerId(name, position),
   name,
   position,
   team,

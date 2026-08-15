@@ -2,6 +2,7 @@ import type { Player, Position } from "../data/players";
 import type { DraftSettings, PickState, StrategySlot } from "./types";
 import { overallPickForRound, roundForOverallPick, totalRounds } from "./types";
 import { TEAM_CONTEXT } from "../data/teams";
+import { INJURY_INFO } from "../data/injuries";
 
 export interface BoardPlayer extends Player {
   overallRank: number;
@@ -29,6 +30,26 @@ export function tiersRemaining(board: BoardPlayer[], position: Position): Map<nu
     counts.set(p.tier, (counts.get(p.tier) ?? 0) + 1);
   }
   return counts;
+}
+
+// Rank penalty for injury risk, in "pick slots" — added to overallRank before sorting for
+// recommendations only (the player board itself still shows the true consensus order).
+// Scaled to how much season the player is actually expected to miss: someone projected back
+// in a game or two barely moves, while a long, uncertain absence (ACL, no timetable) drops
+// them hard. A currently-healthy-but-injury-prone player gets a small flat nudge instead.
+function injuryPenalty(playerId: string): number {
+  const info = INJURY_INFO[playerId];
+  if (!info) return 0;
+  if (info.risk === "long_out") return info.gamesOut * 7;
+  return 10;
+}
+
+function effectiveRank(p: BoardPlayer): number {
+  return p.overallRank + injuryPenalty(p.id);
+}
+
+function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
+  return [...players].sort((a, b) => effectiveRank(a) - effectiveRank(b));
 }
 
 function slotMatches(slot: StrategySlot, position: Position): boolean {
@@ -66,6 +87,7 @@ export interface RoundRecommendation {
   alternates: BoardPlayer[];
   scarcityWarning: string | null;
   byeWarning: string | null;
+  injuryWarning: string | null;
 }
 
 // Projects every one of your remaining picks for the rest of the draft, not just the
@@ -97,17 +119,18 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     const round = roundForOverallPick(overall, teams);
     const isMyPick = overall === overallPickForRound(round, slot, teams);
     const available = currentPool();
+    const ranked = byEffectiveRank(available);
 
     if (!isMyPick) {
-      const takenByOther = available[0];
+      const takenByOther = ranked[0];
       if (takenByOther) simulatedTaken.add(takenByOther.id);
       continue;
     }
 
     const desiredSlot = settings.strategy[round - 1] ?? "BEST";
-    const matching = available.filter((p) => slotMatches(desiredSlot, p.position));
-    const primary = matching[0] ?? available[0] ?? null;
-    const alternates = available.filter((p) => p.id !== primary?.id).slice(0, 9);
+    const matching = ranked.filter((p) => slotMatches(desiredSlot, p.position));
+    const primary = matching[0] ?? ranked[0] ?? null;
+    const alternates = ranked.filter((p) => p.id !== primary?.id).slice(0, 9);
 
     let scarcityWarning: string | null = null;
     if (primary && desiredSlot !== "BEST") {
@@ -132,12 +155,22 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
       }
     }
 
+    let injuryWarning: string | null = null;
+    if (primary) {
+      const info = INJURY_INFO[primary.id];
+      if (info?.risk === "long_out") {
+        injuryWarning = `Expected to miss ~${info.gamesOut} games — ${info.note}`;
+      } else if (info?.risk === "prone") {
+        injuryWarning = `Injury history: ${info.note}`;
+      }
+    }
+
     if (primary) {
       simulatedTaken.add(primary.id);
       myPlayers.push(primary);
     }
 
-    results.push({ round, overallPick: overall, desiredSlot, primary, alternates, scarcityWarning, byeWarning });
+    results.push({ round, overallPick: overall, desiredSlot, primary, alternates, scarcityWarning, byeWarning, injuryWarning });
   }
 
   return results;
