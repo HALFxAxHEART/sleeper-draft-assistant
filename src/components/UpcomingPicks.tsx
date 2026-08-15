@@ -5,6 +5,7 @@ import { buildBoard, recommendForRound } from "../lib/recommend";
 import { overallPickForRound, totalRounds } from "../lib/types";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
+import { ByeSummary } from "./ByeSummary";
 
 const LOOKAHEAD = 4;
 
@@ -22,7 +23,10 @@ export function UpcomingPicks() {
 
   return (
     <section className="upcoming-picks">
-      <h2>Your upcoming picks</h2>
+      <div className="upcoming-picks-head">
+        <h2>Your upcoming picks</h2>
+        <ByeSummary />
+      </div>
       <div className="pick-cards">
         {roundsToShow.map((round) => {
           const overall = overallPickForRound(round, settings.slot, settings.teams);
@@ -51,6 +55,7 @@ export function UpcomingPicks() {
                 <div className="pick-primary empty">No players left</div>
               )}
               {rec.scarcityWarning && <div className="scarcity">{rec.scarcityWarning}</div>}
+              {rec.byeWarning && <div className="bye-warning">{rec.byeWarning}</div>}
               {rec.alternates.length > 0 && (
                 <div className="alternates">
                   {rec.alternates.map((alt) => (

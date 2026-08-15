@@ -1,5 +1,6 @@
 import type { Player, Position } from "../data/players";
 import type { DraftSettings, PickState, StrategySlot } from "./types";
+import { TEAM_CONTEXT } from "../data/teams";
 
 export interface BoardPlayer extends Player {
   overallRank: number;
@@ -44,6 +45,18 @@ export function myPositionCounts(board: BoardPlayer[]): Partial<Record<Position,
   return counts;
 }
 
+// How many "mine" picks share each bye week, so we can flag stacking too many byes together.
+export function myByeCounts(board: BoardPlayer[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  for (const p of board) {
+    if (p.state !== "mine") continue;
+    const bye = TEAM_CONTEXT[p.team]?.bye;
+    if (bye == null) continue;
+    counts.set(bye, (counts.get(bye) ?? 0) + 1);
+  }
+  return counts;
+}
+
 export interface RoundRecommendation {
   round: number;
   overallPick: number;
@@ -51,6 +64,7 @@ export interface RoundRecommendation {
   primary: BoardPlayer | null;
   alternates: BoardPlayer[];
   scarcityWarning: string | null;
+  byeWarning: string | null;
 }
 
 export function recommendForRound(
@@ -78,5 +92,16 @@ export function recommendForRound(
     }
   }
 
-  return { round, overallPick, desiredSlot, primary, alternates, scarcityWarning };
+  let byeWarning: string | null = null;
+  if (primary) {
+    const bye = TEAM_CONTEXT[primary.team]?.bye;
+    if (bye != null) {
+      const existing = myByeCounts(board).get(bye) ?? 0;
+      if (existing >= 2) {
+        byeWarning = `You'd have ${existing + 1} players on bye in Week ${bye} — consider an alternate below.`;
+      }
+    }
+  }
+
+  return { round, overallPick, desiredSlot, primary, alternates, scarcityWarning, byeWarning };
 }

@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { useDraft } from "../state/draftStore";
 import { PLAYERS, type Position } from "../data/players";
-import { buildBoard, type BoardPlayer } from "../lib/recommend";
+import { buildBoard, myByeCounts, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
+import { TEAM_CONTEXT } from "../data/teams";
 
 const TABS: Array<Position | "ALL"> = ["ALL", "QB", "RB", "WR", "TE", "K", "DST"];
 
@@ -14,6 +15,7 @@ export function PlayerBoard() {
   const [hidePicked, setHidePicked] = useState(false);
 
   const board = useMemo(() => buildBoard(PLAYERS, state.pickStates), [state.pickStates]);
+  const byeCounts = useMemo(() => myByeCounts(board), [board]);
 
   const rows = board.filter((p) => {
     if (tab !== "ALL" && p.position !== tab) return false;
@@ -44,13 +46,17 @@ export function PlayerBoard() {
       </div>
 
       <div className="board-list">
-        {rows.map((p) => (
+        {rows.map((p) => {
+          const bye = TEAM_CONTEXT[p.team]?.bye;
+          const byeCount = bye != null ? (byeCounts.get(bye) ?? 0) : 0;
+          const wouldClash = bye != null && (p.state === "mine" ? byeCount >= 3 : byeCount >= 2);
+          return (
           <button key={p.id} className={`board-row state-${p.state}`} onClick={() => cycle(p)}>
             <span className="rank">#{p.overallRank}</span>
             <TierBadge tier={p.tier} />
             <span className="pname">{p.name}</span>
-            <span className="pmeta">
-              {p.position} · {p.team}
+            <span className={`pmeta ${wouldClash ? "bye-clash" : ""}`}>
+              {p.position} · {p.team} · Bye {bye ?? "?"}
             </span>
             <span className="pos-rank muted">
               {p.position}
@@ -59,7 +65,8 @@ export function PlayerBoard() {
             <SOSBadge team={p.team} />
             <span className={`state-tag ${p.state}`}>{p.state === "available" ? "" : p.state === "mine" ? "MINE" : "picked"}</span>
           </button>
-        ))}
+          );
+        })}
         {rows.length === 0 && <div className="empty-state">No players match.</div>}
       </div>
     </section>

@@ -231,12 +231,47 @@ button {
 }
 
 /* Upcoming picks */
+.upcoming-picks-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 .upcoming-picks h2 {
   font-size: 15px;
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.bye-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.bye-summary-label {
+  color: var(--text-dim);
+}
+.bye-chip {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-dim);
+}
+.bye-chip.warn {
+  border-color: #fb923c;
+  color: #fb923c;
+}
+.bye-chip.clash {
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .pick-cards {
@@ -310,6 +345,15 @@ button {
   font-size: 12px;
   color: #fb923c;
   background: rgba(251, 146, 60, 0.1);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.bye-warning {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--danger);
+  background: rgba(244, 63, 94, 0.1);
   border-radius: 6px;
   padding: 6px 8px;
 }
@@ -439,6 +483,10 @@ button {
 .board-row .pmeta {
   color: var(--text-dim);
   min-width: 90px;
+}
+.board-row .pmeta.bye-clash {
+  color: var(--danger);
+  font-weight: 600;
 }
 .board-row .pos-rank {
   min-width: 40px;
