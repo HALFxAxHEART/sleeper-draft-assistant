@@ -189,8 +189,20 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     // Show every remaining player in the same tier as the pick first (so if there are still
     // 5 Tier-1 guys on the board, you see all 5, not just however many happen to fit in a
     // fixed top-N cut), then fill out to a reasonable total with the next-best players.
+    // K/DST tiers are numbered 1-3 on their own separate, position-local scale (not the
+    // shared 1-7 QB/RB/WR/TE consensus scale) — a "Tier 1" kicker is NOT the same caliber
+    // as a Tier 1 RB, so never let them cross-match on tier number alone.
+    const isKickerOrDst = (p: BoardPlayer) => p.position === "K" || p.position === "DST";
     const rest = candidates.filter((p) => p.id !== primary?.id);
-    const sameTier = primary ? rest.filter((p) => p.tier === primary.tier) : [];
+    const sameTier = primary
+      ? rest.filter((p) => {
+          if (p.tier !== primary.tier) return false;
+          // K/DST tiers are position-local (K tier 1 != DST tier 1) — skill position tiers
+          // (QB/RB/WR/TE) share one consensus 1-7 scale, so those can cross-match freely.
+          if (isKickerOrDst(p) || isKickerOrDst(primary)) return p.position === primary.position;
+          return true;
+        })
+      : [];
     const nextBest = primary ? rest.filter((p) => p.tier !== primary.tier) : rest;
     const alternates = [...sameTier, ...nextBest].slice(0, 14);
 

@@ -466,6 +466,19 @@ button {
   color: var(--text);
 }
 
+.alt-toggle {
+  background: transparent;
+  border: none;
+  color: var(--accent-2);
+  font-size: 12px;
+  padding: 4px;
+  cursor: pointer;
+  text-align: left;
+}
+.alt-toggle:hover {
+  text-decoration: underline;
+}
+
 /* Tier badge */
 .tier-badge {
   display: inline-flex;
@@ -918,6 +931,9 @@ button {
     padding: 6px 8px;
   }
   .tbp-team {
+    display: none;
+  }
+  .tbp-player .redzone-badge {
     display: none;
   }
   .pick-cards {

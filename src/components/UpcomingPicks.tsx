@@ -1,13 +1,49 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useDraft } from "../state/draftStore";
 import { PLAYERS } from "../data/players";
-import { buildBoard, recommendAllRounds } from "../lib/recommend";
+import { buildBoard, recommendAllRounds, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
 import { ByeSummary } from "./ByeSummary";
 import { TEAM_CONTEXT } from "../data/teams";
+
+const COLLAPSED_COUNT = 4;
+
+function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onPick: (id: string) => void }) {
+  const [expanded, setExpanded] = useState(false);
+  if (alternates.length === 0) return null;
+
+  const shown = expanded ? alternates : alternates.slice(0, COLLAPSED_COUNT);
+  const hiddenCount = alternates.length - shown.length;
+
+  return (
+    <div className="alternates">
+      <div className="alternates-label">Top {alternates.length + 1} projected available:</div>
+      {shown.map((alt) => (
+        <button key={alt.id} className="alt-chip" onClick={() => onPick(alt.id)} title="Click to mark as drafted by you instead">
+          <TierBadge tier={alt.tier} /> {alt.name}{" "}
+          <span className="muted">
+            {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
+          </span>
+          <RedZoneBadge player={alt} />
+          <InjuryBadge id={alt.id} />
+        </button>
+      ))}
+      {hiddenCount > 0 && (
+        <button className="alt-toggle" onClick={() => setExpanded(true)}>
+          Show {hiddenCount} more
+        </button>
+      )}
+      {expanded && alternates.length > COLLAPSED_COUNT && (
+        <button className="alt-toggle" onClick={() => setExpanded(false)}>
+          Show less
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function UpcomingPicks() {
   const { state, dispatch } = useDraft();
@@ -17,6 +53,10 @@ export function UpcomingPicks() {
   // Every remaining pick, projected: other teams are simulated taking best-available
   // between now and each of your picks, so round 5's board isn't the same as round 1's.
   const recs = useMemo(() => recommendAllRounds(board, settings), [board, settings]);
+
+  function markMine(playerId: string) {
+    dispatch({ type: "SET_PICK", playerId, state: "mine" });
+  }
 
   return (
     <section className="upcoming-picks">
@@ -35,11 +75,7 @@ export function UpcomingPicks() {
               Take: <strong>{rec.desiredSlot === "BEST" ? "best player available" : rec.desiredSlot}</strong>
             </div>
             {rec.primary ? (
-              <button
-                className="pick-primary"
-                onClick={() => dispatch({ type: "SET_PICK", playerId: rec.primary!.id, state: "mine" })}
-                title="Click to mark as drafted by you"
-              >
+              <button className="pick-primary" onClick={() => markMine(rec.primary!.id)} title="Click to mark as drafted by you">
                 <TierBadge tier={rec.primary.tier} />
                 <span className="pname">{rec.primary.name}</span>
                 <span className="pmeta">
@@ -55,26 +91,7 @@ export function UpcomingPicks() {
             {rec.scarcityWarning && <div className="scarcity">{rec.scarcityWarning}</div>}
             {rec.byeWarning && <div className="bye-warning">{rec.byeWarning}</div>}
             {rec.injuryWarning && <div className="injury-warning">{rec.injuryWarning}</div>}
-            {rec.alternates.length > 0 && (
-              <div className="alternates">
-                <div className="alternates-label">Top {rec.alternates.length + 1} projected available:</div>
-                {rec.alternates.map((alt) => (
-                  <button
-                    key={alt.id}
-                    className="alt-chip"
-                    onClick={() => dispatch({ type: "SET_PICK", playerId: alt.id, state: "mine" })}
-                    title="Click to mark as drafted by you instead"
-                  >
-                    <TierBadge tier={alt.tier} /> {alt.name}{" "}
-                    <span className="muted">
-                      {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
-                    </span>
-                    <RedZoneBadge player={alt} />
-                    <InjuryBadge id={alt.id} />
-                  </button>
-                ))}
-              </div>
-            )}
+            <AlternatesList alternates={rec.alternates} onPick={markMine} />
           </div>
         ))}
       </div>
