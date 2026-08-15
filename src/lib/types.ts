@@ -49,10 +49,10 @@ const DEFAULT_STRATEGY_CYCLE: StrategySlot[] = [
   "WR",
   "WR",
   "TE",
-  "QB",
+  "BEST", // QB only if it's the best value left, not forced
   "RB",
   "FLEX",
-  "QB",
+  "BEST", // same — QB competes on value here too
   "TE",
   "BEST",
   "K",
