@@ -14,7 +14,8 @@ import { normalizeName } from "../lib/match";
 import { useDraft } from "../state/draftStore";
 import { upsertDraft, type ArchivedPick } from "../lib/archive";
 
-const POLL_MS = 2000;
+const POLL_MS_IDLE = 2000; // before the draft starts, or once it's paused/complete
+const POLL_MS_ACTIVE = 200; // once picks are actually happening, sync as close to real-time as is reasonable
 const DRAFT_META_EVERY = 5; // draft metadata (teams/slot) rarely changes mid-draft, so refresh it less often than picks
 
 const NAME_INDEX = new Map<string, string>(); // normalized name (+DEF variant) -> player id
@@ -40,6 +41,7 @@ export function useSleeperSync() {
   useEffect(() => {
     if (!sleeperDraftId) return;
     let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     let userLookupDone = false;
     let leagueLookupDone = false;
     let pollCount = 0;
@@ -167,14 +169,21 @@ export function useSleeperSync() {
         if (!cancelled) {
           dispatch({ type: "SLEEPER_STATUS", status: "error", error: err instanceof Error ? err.message : String(err) });
         }
+      } finally {
+        // Self-rescheduling rather than a fixed setInterval — at a 200ms cadence, an interval
+        // would let requests stack up if one poll ever took longer than that to resolve.
+        // Scheduling the next one only after this one finishes avoids that entirely.
+        if (!cancelled) {
+          const delay = draftMeta?.status === "drafting" ? POLL_MS_ACTIVE : POLL_MS_IDLE;
+          timeoutId = setTimeout(poll, delay);
+        }
       }
     }
 
     poll();
-    const interval = setInterval(poll, POLL_MS);
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sleeperDraftId, sleeperUsername]);

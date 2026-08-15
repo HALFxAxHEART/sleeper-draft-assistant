@@ -9,7 +9,7 @@ import { RedZoneBadge } from "./RedZoneBadge";
 import { ByeSummary } from "./ByeSummary";
 import { TEAM_CONTEXT } from "../data/teams";
 
-const COLLAPSED_COUNT = 4;
+const COLLAPSED_COUNT = 10;
 
 function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onPick: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
