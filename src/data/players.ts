@@ -160,6 +160,106 @@ const RAW: Array<[string, Position, string, number]> = [
   ["Jalen Coker", "WR", "CAR", 7],
   ["Romeo Doubs", "WR", "NE", 7],
 
+  // Tier 8 (bench/handcuff/streaming depth, Aug 2026)
+  ["Alvin Kamara", "RB", "NO", 8],  // Splits Saints backfield with Etienne; proven receiving role
+  ["Brian Robinson Jr.", "RB", "ATL", 8],  // Former starter, handcuff to Bijan with goal-line role
+  ["Justice Hill", "RB", "BAL", 8],  // Receiving back, would start if Henry gets hurt
+  ["Ray Davis", "RB", "BUF", 8],  // Handcuff to Cook with short-yardage and goal-line role
+  ["Samaje Perine", "RB", "CIN", 8],  // Veteran receiving back, would start if Chase Brown hurt
+  ["Dylan Sampson", "RB", "CLE", 8],  // Rookie handcuff to Judkins, change-of-pace role
+  ["Jaydon Blue", "RB", "DAL", 8],  // Handcuff to Javonte Williams with passing-down role
+  ["Isiah Pacheco", "RB", "DET", 8],  // Former Chiefs starter, now handcuff to Gibbs
+  ["MarShawn Lloyd", "RB", "GB", 8],  // Handcuff to Josh Jacobs, would start if hurt
+  ["Woody Marks", "RB", "HOU", 8],  // Pass-catching role behind Montgomery, real standalone value
+  ["DJ Giddens", "RB", "IND", 8],  // Handcuff to Jonathan Taylor, lead-back upside if hurt
+  ["Jaylen Wright", "RB", "MIA", 8],  // Handcuff to Achane, would start if hurt
+  ["Devin Singletary", "RB", "NYG", 8],  // Veteran depth, standalone value if Giants backs hurt
+  ["Braelon Allen", "RB", "NYJ", 8],  // Handcuff to Breece Hall with early-down and goal-line role
+  ["Tank Bigsby", "RB", "PHI", 8],  // Handcuff to Saquon Barkley, early-down role
+  ["Kaleb Johnson", "RB", "PIT", 8],  // Rookie handcuff, would start if Warren or Dowdle hurt
+  ["Zach Charbonnet", "RB", "SEA", 8],  // Seattle's other lead back, real standalone value
+  ["Isaac Guerendo", "RB", "SF", 8],  // Handcuff to McCaffrey, would start if hurt
+  ["Tyjae Spears", "RB", "TEN", 8],  // Passing-down back with standalone value behind Pollard
+  ["Jahan Dotson", "WR", "ATL", 8],  // Falcons WR2, real snaps if London misses time
+  ["Rashod Bateman", "WR", "BAL", 8],  // Ravens WR2 with proven big-play production
+  ["Xavier Legette", "WR", "CAR", 8],  // Panthers WR2, athletic size-speed target
+  ["Jerry Jeudy", "WR", "CLE", 8],  // Browns WR1, real target volume in rebuild
+  ["Marvin Mims Jr.", "WR", "DEN", 8],  // Broncos WR2 with growing target share
+  ["Matthew Golden", "WR", "GB", 8],  // Packers rookie first-rounder, breakout WR2 candidate
+  ["Travis Hunter", "WR", "JAC", 8],  // Jaguars two-way star, real WR2 volume
+  ["Tre Tucker", "WR", "LV", 8],  // Raiders WR1, leading target share
+  ["Tutu Atwell", "WR", "MIA", 8],  // Dolphins WR1, speedster in new lead role
+  ["Jauan Jennings", "WR", "MIN", 8],  // Vikings WR3, proven veteran target
+  ["Kayshon Boutte", "WR", "NE", 8],  // Patriots WR2 next to A.J. Brown
+  ["Darnell Mooney", "WR", "NYG", 8],  // Giants WR2, real production when healthy
+  ["Hollywood Brown", "WR", "PHI", 8],  // Eagles WR2, vertical threat next to Smith
+  ["Tory Horton", "WR", "SEA", 8],  // Seahawks rookie WR2, ascending target share
+  ["Christian Kirk", "WR", "SF", 8],  // 49ers WR2, reliable possession target
+  ["Jalen McMillan", "WR", "TB", 8],  // Buccaneers WR3, real red-zone role
+  ["Calvin Ridley", "WR", "TEN", 8],  // Titans WR2, proven veteran production
+  ["Stefon Diggs", "WR", "WAS", 8],  // Commanders WR2, big name still relevant
+  ["T.J. Hockenson", "TE", "MIN", 8],  // Vikings' primary receiving TE, strong target share
+  ["Hunter Henry", "TE", "NE", 8],  // Reliable red-zone target, veteran Patriots starter
+  ["Evan Engram", "TE", "DEN", 8],  // Broncos' pass-catching TE, heavy target volume
+  ["Dalton Schultz", "TE", "HOU", 8],  // Texans' starting TE, steady check-down role
+  ["Cade Otton", "TE", "TB", 8],  // Bucs' primary TE, red-zone role in Tampa offense
+  ["Pat Freiermuth", "TE", "PIT", 8],  // Steelers' starting TE, goal-line and possession role
+  ["David Njoku", "TE", "LAC", 8],  // Proven producer, now Chargers' TE room after trade
+  ["Mike Gesicki", "TE", "CIN", 8],  // Bengals' red-zone TE threat, size mismatch weapon
+  ["Tyler Higbee", "TE", "LAR", 8],  // Rams' veteran starting TE, still involved in passing game
+  ["Brenton Strange", "TE", "JAC", 8],  // Jaguars' ascending starting TE, growing role
+  ["Mason Taylor", "TE", "NYJ", 8],  // Jets' talented young starting TE, early-down and red-zone use
+  ["Chig Okonkwo", "TE", "WAS", 8],  // Athletic Commanders TE after trade, big-play upside
+  ["Geno Smith", "QB", "NYJ", 8],  // Steady Jets starter, solid weekly floor
+  ["Sam Darnold", "QB", "SEA", 8],  // Seahawks starter coming off strong 2025 bounce-back
+  ["Aaron Rodgers", "QB", "PIT", 8],  // Veteran Steelers starter, still throws for volume
+  ["Cam Ward", "QB", "TEN", 8],  // Titans' former top prospect, rushing upside as starter
+  ["C.J. Stroud", "QB", "HOU", 8],  // Talented Texans starter, sneaky streamer with weapons
+  ["Kirk Cousins", "QB", "LV", 8],  // Veteran Raiders starter, high-volume passer
+  ["Daniel Jones", "QB", "IND", 8],  // Colts starter, added rushing floor
+  ["Bryce Young", "QB", "CAR", 8],  // Panthers starter showing improvement, streamable in good matchups
+  ["Tua Tagovailoa", "QB", "ATL", 8],  // Falcons starter after trade, efficient when healthy
+  ["Deshaun Watson", "QB", "CLE", 8],  // Browns starter, dual-threat upside if healthy
+
+  // Tier 9 (deep fliers/waiver stashes, Aug 2026)
+  ["Tyler Goodson", "RB", "ATL", 9],  // Pass-catching depth behind Bijan Robinson in Atlanta
+  ["Jonah Coleman", "RB", "DEN", 9],  // Rookie depth behind Dobbins and Harvey in Denver
+  ["Sione Vaki", "RB", "DET", 9],  // Versatile Lions depth back, some passing-down usage
+  ["Emari Demercado", "RB", "KC", 9],  // Passing-down depth behind Kenneth Walker in KC
+  ["Keaton Mitchell", "RB", "LAC", 9],  // Speedy handcuff behind Omarion Hampton in LA
+  ["Jarquez Hunter", "RB", "LAR", 9],  // Rookie depth behind Kyren Williams and Corum
+  ["Dylan Laube", "RB", "LV", 9],  // Passing-down back behind Ashton Jeanty in Vegas
+  ["Devin Neal", "RB", "NO", 9],  // Rookie change-of-pace back in crowded Saints backfield
+  ["Sean Tucker", "RB", "TB", 9],  // Depth behind Irving and Gainwell in Tampa
+  ["Devin Duvernay", "WR", "ARI", 9],  // Cardinals WR2, kick returner with big-play upside
+  ["Devontez Walker", "WR", "BAL", 9],  // Ravens WR3, deep-threat flier for touchdowns
+  ["Joshua Palmer", "WR", "BUF", 9],  // Bills WR2, veteran hands in high-powered offense
+  ["Andrei Iosivas", "WR", "CIN", 9],  // Bengals WR3, red-zone size behind stars
+  ["Cedric Tillman", "WR", "CLE", 9],  // Browns WR2, breakout-upside flier
+  ["Troy Franklin", "WR", "DEN", 9],  // Broncos depth WR, former top-round talent
+  ["Greg Dortch", "WR", "DET", 9],  // Lions WR3, slot role in efficient offense
+  ["Tank Dell", "WR", "HOU", 9],  // Texans WR2, talented but injury-prone flier
+  ["Nick Westbrook-Ikhine", "WR", "IND", 9],  // Colts WR2 while Pierce is out
+  ["Tre' Harris", "WR", "LAC", 9],  // Chargers rookie WR, size-speed flier
+  ["Jalen Nailor", "WR", "LV", 9],  // Raiders depth WR, big-play upside
+  ["Bryce Lance", "WR", "NO", 9],  // Saints WR2, emerging role in rebuild
+  ["Rashid Shaheed", "WR", "SEA", 9],  // Seahawks deep threat, big-play flier
+  ["Odell Beckham Jr.", "WR", "NYG", 9],  // Giants veteran WR3, name-value flier
+  ["Adonai Mitchell", "WR", "NYJ", 9],  // Jets depth WR, former high-upside rookie
+  ["Roman Wilson", "WR", "PIT", 9],  // Steelers WR3, developing role behind Metcalf
+  ["Cooper Kupp", "WR", "SEA", 9],  // Seahawks veteran, name-value depth flier
+  ["Jacob Cowing", "WR", "SF", 9],  // 49ers WR3, slot role with upside
+  ["Elic Ayomanor", "WR", "TEN", 9],  // Titans depth WR, rookie flier
+  ["Treylon Burks", "WR", "WAS", 9],  // Commanders WR3, former first-round pick flier
+  ["Tommy Tremble", "TE", "CAR", 9],  // Panthers' starting TE, touchdown-dependent streamer
+  ["Greg Dulcich", "TE", "MIA", 9],  // Talented but injury-prone Dolphins TE1, boom/bust flier
+  ["Gunnar Helm", "TE", "TEN", 9],  // Rookie Titans starting TE, unproven but featured
+  ["AJ Barner", "TE", "SEA", 9],  // Second-year Seahawks TE, growing role in offense
+  ["Juwan Johnson", "TE", "NO", 9],  // Saints' veteran TE, inconsistent but touchdown-capable
+  ["Jacoby Brissett", "QB", "ARI", 9],  // Cardinals starter, game-manager streamer in a pinch
+  ["Malik Willis", "QB", "MIA", 9],  // Dolphins starter, low-floor rushing-dependent flier
+  ["Anthony Richardson Sr.", "QB", "IND", 9],  // Colts backup, huge rushing ceiling if he starts
+
   // Kickers (drafted last; tiers loose)
   ["Cameron Dicker", "K", "LAC", 1],
   ["Brandon Aubrey", "K", "DAL", 1],
