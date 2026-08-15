@@ -972,37 +972,49 @@ button {
     gap: 14px;
   }
   .draft-layout {
-    gap: 10px;
+    gap: 8px;
   }
   .draft-right {
-    flex-basis: 260px;
+    flex-basis: 230px;
   }
   .top-by-pos {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 5px;
   }
   .tbp-cell {
-    padding: 6px 8px;
+    padding: 5px 6px;
   }
   .tbp-team {
     display: none;
   }
   .pick-cards {
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 6px;
   }
   .pick-card {
-    padding: 8px;
+    padding: 6px;
+    font-size: 12px;
+  }
+  .round-tag {
+    font-size: 11px;
+    padding: 1px 4px;
   }
   .take-line {
-    font-size: 12px;
-    margin-bottom: 6px;
+    font-size: 11px;
+    margin-bottom: 5px;
   }
   .pick-primary {
-    padding: 8px;
+    padding: 6px;
+    gap: 4px;
   }
   .alternates {
     margin-top: 6px;
+  }
+  .alt-chip {
+    font-size: 11px;
+  }
+  .pick-card-head {
+    gap: 4px;
   }
   .team-grades {
     gap: 12px;
@@ -1011,7 +1023,7 @@ button {
 
 /* Below this, even shrunk cards don't have room to breathe next to the master list —
    stack instead: best-by-position, then round picks, then the master board list. */
-@media (max-width: 600px) {
+@media (max-width: 460px) {
   .draft-layout {
     flex-direction: column;
   }

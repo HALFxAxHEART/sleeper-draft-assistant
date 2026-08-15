@@ -14,7 +14,7 @@ export function PlayerBoard() {
   const { state, dispatch } = useDraft();
   const [tab, setTab] = useState<Position | "ALL">("ALL");
   const [query, setQuery] = useState("");
-  const [hidePicked, setHidePicked] = useState(false);
+  const [hidePicked, setHidePicked] = useState(true);
 
   const board = useMemo(() => buildBoard(PLAYERS, state.pickStates), [state.pickStates]);
   const byeCounts = useMemo(() => myByeCounts(board), [board]);
