@@ -21,7 +21,7 @@ export interface PickGrade {
 }
 
 export interface TeamReview {
-  rosterId: number;
+  slot: number;
   teamName: string;
   isMine: boolean;
   picks: PickGrade[];
@@ -45,7 +45,7 @@ function letterGrade(avgGap: number | null): string {
 export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
   const picks = [...archived.picks].sort((a, b) => a.overall - b.overall);
   const takenSkill = new Set<string>();
-  const teams = new Map<number, TeamReview>();
+  const teams = new Map<number, TeamReview>(); // keyed by draft slot, not roster_id — see ArchivedPick.slot
 
   for (const pick of picks) {
     const info = pick.playerId ? RANK_BY_ID.get(pick.playerId) : undefined;
@@ -86,10 +86,10 @@ export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
 
     const grade: PickGrade = { pick, rank: info?.rank ?? null, tier: info?.tier ?? null, bestAvailable, gap, label, note };
 
-    if (!teams.has(pick.rosterId)) {
-      teams.set(pick.rosterId, { rosterId: pick.rosterId, teamName: pick.teamName, isMine: pick.isMine, picks: [], gradedCount: 0, avgGap: null, grade: "—" });
+    if (!teams.has(pick.slot)) {
+      teams.set(pick.slot, { slot: pick.slot, teamName: pick.teamName, isMine: pick.isMine, picks: [], gradedCount: 0, avgGap: null, grade: "—" });
     }
-    teams.get(pick.rosterId)!.picks.push(grade);
+    teams.get(pick.slot)!.picks.push(grade);
 
     if (pick.playerId && isSkillPosition) takenSkill.add(pick.playerId);
   }

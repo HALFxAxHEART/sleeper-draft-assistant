@@ -83,7 +83,7 @@ export function DraftReview() {
 
             <div className="team-grades">
               {teams.map((team) => (
-                <div key={team.rosterId} className={`team-card ${team.isMine ? "mine" : ""}`}>
+                <div key={team.slot} className={`team-card ${team.isMine ? "mine" : ""}`}>
                   <div className="team-card-head">
                     <span className="team-name">
                       {team.teamName}

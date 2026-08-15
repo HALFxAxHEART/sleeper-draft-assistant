@@ -44,7 +44,12 @@ export function useSleeperSync() {
     let leagueLookupDone = false;
     let pollCount = 0;
     let lastTeams: number | undefined;
-    let teamNames = new Map<number, string>();
+    // Draft slot (1..teams) is the one identity guaranteed to be present and stable for
+    // every pick, in both real league drafts and standalone mock drafts (mocks have no
+    // real rosters, so roster_id often comes back the same value — e.g. 0 — for everyone,
+    // which would otherwise collapse every team into one). Real team names, when we can
+    // resolve them, are attached per-slot via the draft's slot_to_roster_id mapping.
+    let slotNames = new Map<number, string>();
     let myRosterId: number | null = null;
     let draftMeta: { status: string; leagueId: string | null; season: string; name: string; teams: number } | null = null;
 
@@ -87,9 +92,16 @@ export function useSleeperSync() {
               ]);
               if (league?.name) draftMeta.name = league.name;
               const nameByUser = new Map(users.map((u) => [u.user_id, u.metadata?.team_name || u.display_name || "Unnamed team"]));
+              const nameByRoster = new Map<number, string>();
               for (const r of rosters) {
-                teamNames.set(r.roster_id, r.owner_id ? (nameByUser.get(r.owner_id) ?? `Team ${r.roster_id}`) : `Team ${r.roster_id}`);
+                if (r.owner_id) nameByRoster.set(r.roster_id, nameByUser.get(r.owner_id) ?? `Team ${r.roster_id}`);
                 if (myUserIdRef.current && r.owner_id === myUserIdRef.current) myRosterId = r.roster_id;
+              }
+              if (draft.slot_to_roster_id) {
+                for (const [slotStr, rosterId] of Object.entries(draft.slot_to_roster_id)) {
+                  const name = nameByRoster.get(rosterId);
+                  if (name) slotNames.set(Number(slotStr), name);
+                }
               }
             } catch {
               // best-effort — team names just fall back to "Team N" and isMine falls back to slot-matching
@@ -122,8 +134,9 @@ export function useSleeperSync() {
           archivedPicks.push({
             overall: pick.pick_no,
             round: pick.round,
+            slot: pick.draft_slot,
             rosterId: pick.roster_id,
-            teamName: teamNames.get(pick.roster_id) ?? `Team ${pick.draft_slot}`,
+            teamName: slotNames.get(pick.draft_slot) ?? `Team ${pick.draft_slot}`,
             isMine,
             playerId,
             playerName: matchedPlayer?.name ?? (`${first} ${last}`.trim() || "Unknown player"),

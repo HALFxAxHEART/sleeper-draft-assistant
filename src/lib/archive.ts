@@ -4,6 +4,7 @@
 export interface ArchivedPick {
   overall: number;
   round: number;
+  slot: number; // draft slot (1..teams) — the reliable per-team identity; mock drafts don't have real rosters
   rosterId: number;
   teamName: string;
   isMine: boolean;
