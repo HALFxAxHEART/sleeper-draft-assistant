@@ -5,6 +5,7 @@ import { buildBoard, recommendAllRounds } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { SOSBadge } from "./SOSBadge";
 import { ByeSummary } from "./ByeSummary";
+import { TEAM_CONTEXT } from "../data/teams";
 
 export function UpcomingPicks() {
   const { state, dispatch } = useDraft();
@@ -40,7 +41,7 @@ export function UpcomingPicks() {
                 <TierBadge tier={rec.primary.tier} />
                 <span className="pname">{rec.primary.name}</span>
                 <span className="pmeta">
-                  {rec.primary.position} · {rec.primary.team}
+                  {rec.primary.position} · {rec.primary.team} · Bye {TEAM_CONTEXT[rec.primary.team]?.bye ?? "?"}
                 </span>
                 <SOSBadge team={rec.primary.team} />
               </button>
@@ -59,7 +60,10 @@ export function UpcomingPicks() {
                     onClick={() => dispatch({ type: "SET_PICK", playerId: alt.id, state: "mine" })}
                     title="Click to mark as drafted by you instead"
                   >
-                    <TierBadge tier={alt.tier} /> {alt.name} <span className="muted">{alt.position} · {alt.team}</span>
+                    <TierBadge tier={alt.tier} /> {alt.name}{" "}
+                    <span className="muted">
+                      {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
+                    </span>
                   </button>
                 ))}
               </div>
