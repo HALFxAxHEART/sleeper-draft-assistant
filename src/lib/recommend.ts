@@ -173,38 +173,28 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
 
     const desiredSlot = settings.strategy[round - 1] ?? "BEST";
 
-    // "BEST" is pure value with no positional target, but a 2nd/3rd QB has near-zero
-    // standalone value in a single-QB league once your starter is rostered — unlike RB/WR/TE,
-    // which stay useful as bench/flex depth. So once the QB slot is filled, don't auto-suggest
-    // a QB as the top "BEST" pick just because it edges an RB/WR/TE on pure consensus rank.
-    // An explicit strategy pick of "QB" for a round still overrides this — only the auto
-    // "BEST" heuristic is affected. This only steers the PRIMARY suggestion — a good QB still
-    // shows up in the alternates list below, it just isn't auto-picked for you.
+    // A 2nd/3rd QB has near-zero standalone value once your starter(s) are rostered —
+    // unlike RB/WR/TE, which stay useful as bench/flex depth. So once roster.QB is filled,
+    // never auto-suggest another QB as the primary pick — not even if a round's strategy
+    // is explicitly set to "QB" (that just falls back to best-available-non-QB instead).
+    // This only steers the PRIMARY suggestion — a good QB still shows up in the alternates
+    // list below, it just isn't auto-picked or forced on you.
     const myQBCount = myPlayers.filter((p) => p.position === "QB").length;
-    const qbSaturated = desiredSlot === "BEST" && myQBCount >= settings.roster.QB;
+    const qbSaturated = myQBCount >= settings.roster.QB;
     const primaryCandidates = qbSaturated && ranked.some((p) => p.position !== "QB") ? ranked.filter((p) => p.position !== "QB") : ranked;
 
     const matching = primaryCandidates.filter((p) => slotMatches(desiredSlot, p.position));
     const primary = matching[0] ?? primaryCandidates[0] ?? null;
 
     // Show every remaining player in the same tier as the pick first (so if there are still
-    // 5 Tier-1 guys on the board, you see all 5, not just however many happen to fit in a
+    // 5 Tier-1 RBs on the board, you see all 5, not just however many happen to fit in a
     // fixed top-N cut), then fill out to a reasonable total with the next-best players.
-    // K/DST tiers are numbered 1-3 on their own separate, position-local scale (not the
-    // shared 1-7 QB/RB/WR/TE consensus scale) — a "Tier 1" kicker is NOT the same caliber
-    // as a Tier 1 RB, so never let them cross-match on tier number alone.
-    const isKickerOrDst = (p: BoardPlayer) => p.position === "K" || p.position === "DST";
+    // Every position now has its OWN tier scale (Tier 1 = that position's best available,
+    // not a cross-position comparison) — so tier matches only make sense within the same
+    // position, never across positions.
     const rest = ranked.filter((p) => p.id !== primary?.id);
-    const sameTier = primary
-      ? rest.filter((p) => {
-          if (p.tier !== primary.tier) return false;
-          // K/DST tiers are position-local (K tier 1 != DST tier 1) — skill position tiers
-          // (QB/RB/WR/TE) share one consensus 1-7 scale, so those can cross-match freely.
-          if (isKickerOrDst(p) || isKickerOrDst(primary)) return p.position === primary.position;
-          return true;
-        })
-      : [];
-    const nextBest = primary ? rest.filter((p) => p.tier !== primary.tier) : rest;
+    const sameTier = primary ? rest.filter((p) => p.position === primary.position && p.tier === primary.tier) : [];
+    const nextBest = primary ? rest.filter((p) => !(p.position === primary.position && p.tier === primary.tier)) : rest;
     const alternates = [...sameTier, ...nextBest].slice(0, 14);
 
     let scarcityWarning: string | null = null;
