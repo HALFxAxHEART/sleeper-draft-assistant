@@ -749,6 +749,132 @@ button {
   color: var(--text-dim);
 }
 
+/* Player name, clickable on its own to open the detail popup — the rest of the row
+   still does the normal draft-pick action, so this needs its own distinct affordance. */
+.info-trigger {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--text-dim);
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.info-trigger:hover {
+  color: var(--accent-2);
+  text-decoration-color: var(--accent-2);
+}
+
+/* Player detail popup */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.modal-close:hover {
+  color: var(--text);
+  background: var(--panel-2);
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-right: 24px;
+  margin-bottom: 16px;
+}
+.modal-head h2 {
+  margin: 0 0 4px;
+  font-size: 19px;
+}
+
+.modal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.modal-stat {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.modal-stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+}
+.modal-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+.modal-stat-value.sos-easy {
+  color: var(--ok);
+}
+.modal-stat-value.sos-medium {
+  color: #fb923c;
+}
+.modal-stat-value.sos-hard {
+  color: var(--danger);
+}
+
+.modal-section {
+  margin-bottom: 14px;
+}
+.modal-section h3 {
+  margin: 0 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+}
+.modal-section p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 /* Draft review */
 .draft-review {
   display: flex;
@@ -1075,10 +1201,10 @@ button {
   .draft-layout {
     gap: 6px;
   }
-  /* The master list is what you're scanning constantly during a live draft — give IT
-     the room and let the round-pick column be the narrow one, not the other way round. */
+  /* Even split — giving the master list all the leftover space made it dominate the
+     screen once the round-pick column was already shrunk down. */
   .draft-left {
-    flex: 0 0 128px;
+    flex: 1 1 0;
   }
   .draft-right {
     flex: 1 1 0;

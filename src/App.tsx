@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DraftProvider } from "./state/draftStore";
+import { DetailProvider } from "./state/detailStore";
 import { useSleeperSync } from "./hooks/useSleeperSync";
 import { Header } from "./components/Header";
 import { SettingsPanel } from "./components/SettingsPanel";
@@ -7,6 +8,7 @@ import { UpcomingPicks } from "./components/UpcomingPicks";
 import { PlayerBoard } from "./components/PlayerBoard";
 import { DraftReview } from "./components/DraftReview";
 import { TopByPosition } from "./components/TopByPosition";
+import { PlayerDetailModal } from "./components/PlayerDetailModal";
 
 function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -36,6 +38,7 @@ function Shell() {
           )}
         </main>
       </div>
+      <PlayerDetailModal />
     </div>
   );
 }
@@ -43,7 +46,9 @@ function Shell() {
 export default function App() {
   return (
     <DraftProvider>
-      <Shell />
+      <DetailProvider>
+        <Shell />
+      </DetailProvider>
     </DraftProvider>
   );
 }

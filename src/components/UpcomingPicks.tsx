@@ -3,16 +3,16 @@ import { useDraft } from "../state/draftStore";
 import { PLAYERS } from "../data/players";
 import { buildBoard, recommendAllRounds, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
-import { SOSBadge } from "./SOSBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
 import { ByeSummary } from "./ByeSummary";
-import { TEAM_CONTEXT } from "../data/teams";
+import { useDetail } from "../state/detailStore";
 
 const COLLAPSED_COUNT = 10;
 
 function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onPick: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
+  const { open } = useDetail();
   if (alternates.length === 0) return null;
 
   const shown = expanded ? alternates : alternates.slice(0, COLLAPSED_COUNT);
@@ -24,14 +24,21 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
       {shown.map((alt) => (
         <button key={alt.id} className="alt-chip" onClick={() => onPick(alt.id)} title="Click to mark as drafted by you instead">
           <TierBadge tier={alt.tier} />
-          <span className="alt-name">{alt.name}</span>
+          <span
+            className="alt-name info-trigger"
+            onClick={(e) => {
+              e.stopPropagation();
+              open(alt.id);
+            }}
+            title="Click for player details"
+          >
+            {alt.name}
+          </span>
           <span className="row-badges">
             <RedZoneBadge player={alt} />
             <InjuryBadge id={alt.id} />
           </span>
-          <span className="muted alt-meta">
-            {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
-          </span>
+          <span className="muted alt-meta">{alt.position} · {alt.team}</span>
         </button>
       ))}
       {hiddenCount > 0 && (
@@ -50,6 +57,7 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
 
 export function UpcomingPicks() {
   const { state, dispatch } = useDraft();
+  const { open } = useDetail();
   const { settings, pickStates } = state;
   const board = useMemo(() => buildBoard(PLAYERS, pickStates), [pickStates]);
 
@@ -80,15 +88,21 @@ export function UpcomingPicks() {
             {rec.primary ? (
               <button className="pick-primary" onClick={() => markMine(rec.primary!.id)} title="Click to mark as drafted by you">
                 <TierBadge tier={rec.primary.tier} />
-                <span className="pname">{rec.primary.name}</span>
+                <span
+                  className="pname info-trigger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    open(rec.primary!.id);
+                  }}
+                  title="Click for player details"
+                >
+                  {rec.primary.name}
+                </span>
                 <span className="row-badges">
-                  <SOSBadge team={rec.primary.team} />
                   <RedZoneBadge player={rec.primary} />
                   <InjuryBadge id={rec.primary.id} />
                 </span>
-                <span className="pmeta">
-                  {rec.primary.position} · {rec.primary.team} · Bye {TEAM_CONTEXT[rec.primary.team]?.bye ?? "?"}
-                </span>
+                <span className="pmeta">{rec.primary.position} · {rec.primary.team}</span>
               </button>
             ) : (
               <div className="pick-primary empty">No players left</div>
