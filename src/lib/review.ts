@@ -28,6 +28,8 @@ export interface TeamReview {
   gradedCount: number;
   avgGap: number | null;
   grade: string;
+  rank: number | null; // 1 = best draft in the league by avg gap; null if nothing graded
+  totalTeams: number;
 }
 
 const RANK_BY_ID = new Map(PLAYERS.map((p, i) => [p.id, { rank: i + 1, tier: p.tier, position: p.position, name: p.name }]));
@@ -87,7 +89,17 @@ export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
     const grade: PickGrade = { pick, rank: info?.rank ?? null, tier: info?.tier ?? null, bestAvailable, gap, label, note };
 
     if (!teams.has(pick.slot)) {
-      teams.set(pick.slot, { slot: pick.slot, teamName: pick.teamName, isMine: pick.isMine, picks: [], gradedCount: 0, avgGap: null, grade: "—" });
+      teams.set(pick.slot, {
+        slot: pick.slot,
+        teamName: pick.teamName,
+        isMine: pick.isMine,
+        picks: [],
+        gradedCount: 0,
+        avgGap: null,
+        grade: "—",
+        rank: null,
+        totalTeams: 0,
+      });
     }
     teams.get(pick.slot)!.picks.push(grade);
 
@@ -101,5 +113,19 @@ export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
     team.avgGap = graded.length ? graded.reduce((sum, p) => sum + (p.gap ?? 0), 0) / graded.length : null;
     team.grade = letterGrade(team.avgGap);
   }
+
+  // Rank every team 1..N by avg gap (lower = drafted closer to best-available = better) —
+  // mutates the same TeamReview objects held in `result`, so display order below is unaffected.
+  const byGap = [...result].sort((a, b) => {
+    if (a.avgGap == null && b.avgGap == null) return 0;
+    if (a.avgGap == null) return 1;
+    if (b.avgGap == null) return -1;
+    return a.avgGap - b.avgGap;
+  });
+  byGap.forEach((team, i) => {
+    team.rank = team.avgGap != null ? i + 1 : null;
+    team.totalTeams = result.length;
+  });
+
   return result.sort((a, b) => (a.isMine === b.isMine ? a.teamName.localeCompare(b.teamName) : a.isMine ? -1 : 1));
 }

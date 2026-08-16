@@ -89,7 +89,10 @@ export function DraftReview() {
                       {team.teamName}
                       {team.isMine && <span className="you-tag">YOU</span>}
                     </span>
-                    <span className={`letter-grade grade-${team.grade}`}>{team.grade}</span>
+                    <span className="team-head-badges">
+                      <span className="team-rank">{team.rank != null ? `#${team.rank} of ${team.totalTeams}` : "Unranked"}</span>
+                      <span className={`letter-grade grade-${team.grade}`}>{team.grade}</span>
+                    </span>
                   </div>
                   {team.avgGap != null && (
                     <div className="team-avg muted">Avg. {team.avgGap.toFixed(1)} ranks below best available ({team.gradedCount} graded picks)</div>
