@@ -110,4 +110,21 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
   [playerId("Khalil Shakir", "WR")]: entry("prone", 0, "Recurring high ankle sprains in back-to-back preseasons/seasons"),
   [playerId("Jalen Coker", "WR")]: entry("prone", 0, "Missed 6 games in 2025 with a quad strain; healthy now"),
   [playerId("Romeo Doubs", "WR")]: entry("prone", 0, "History of multiple concussions (two in 2024); minor camp absence"),
+
+  // --- Extended depth additions (top 248-400) ---
+  [playerId("Kendre Miller", "RB")]: entry("prone", 0, "recurring knee-hamstring issues have limited practice availability"),
+  [playerId("Trey Benson", "RB")]: entry("long_out", 6, "missed time in 2025 recovering from a knee injury"),
+  [playerId("Elijah Mitchell", "RB")]: entry("prone", 0, "chronic hamstring and ankle injuries have repeatedly cost him time"),
+  [playerId("Evan Hull", "RB")]: entry("long_out", 5, "missed games in 2025 with a knee injury"),
+  [playerId("Marlon Mack", "RB")]: entry("prone", 0, "injury history, past ACL tear"),
+  [playerId("Kenny McIntosh", "RB")]: entry("prone", 0, "injury-prone, dealt with a lingering lower-leg issue"),
+  [playerId("Keenan Allen", "WR")]: entry("prone", 0, "hamstring"),
+  [playerId("Rondale Moore", "WR")]: entry("prone", 0, "soft-tissue/hamstring"),
+  [playerId("Jalin Hyatt", "WR")]: entry("long_out", 3, "hamstring strain"),
+  [playerId("Zay Jones", "WR")]: entry("prone", 0, "recurring lower-body injuries have limited his availability"),
+  [playerId("Erik Ezukanma", "WR")]: entry("long_out", 6, "missed roughly six games in 2025 with a concussion/lower-body injury"),
+  [playerId("Luke Musgrave", "TE")]: entry("prone", 0, "recurring hamstring tightness has periodically limited practice reps"),
+  [playerId("Foster Moreau", "TE")]: entry("long_out", 3, "offseason hip procedure limited camp and early-season workload"),
+  [playerId("Will Levis", "QB")]: entry("prone", 0, "shoulder soreness that flares up under contact"),
+  [playerId("Joe Milton III", "QB")]: entry("long_out", 3, "thumb injury that limited offseason and camp reps"),
 };
