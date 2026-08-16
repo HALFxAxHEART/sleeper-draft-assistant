@@ -673,7 +673,7 @@ button {
 
 .board-row {
   display: grid;
-  grid-template-columns: 32px auto minmax(0, 1fr) auto auto;
+  grid-template-columns: 32px auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 8px;
   row-gap: 4px;
@@ -700,9 +700,18 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Position/team/bye + SOS/red-zone/injury badges share a second, full-width, wrapping
+   line below the name — badges used to sit inline right after the name and eat its
+   space first, which is exactly what forced hard truncation in a narrow column. */
+.board-row .row-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
 .board-row .pmeta {
   color: var(--text-dim);
-  grid-column: 1 / -1;
   font-size: 12px;
 }
 .board-row .pmeta.bye-clash {
@@ -1001,7 +1010,7 @@ button {
     gap: 8px;
   }
   .draft-right {
-    flex-basis: 230px;
+    flex-basis: 300px;
   }
   .top-by-pos {
     /* Now full-width above the two-pane layout (not squeezed into the left column
@@ -1066,8 +1075,13 @@ button {
   .draft-layout {
     gap: 6px;
   }
+  /* The master list is what you're scanning constantly during a live draft — give IT
+     the room and let the round-pick column be the narrow one, not the other way round. */
+  .draft-left {
+    flex: 0 0 128px;
+  }
   .draft-right {
-    flex-basis: 118px;
+    flex: 1 1 0;
     max-height: calc(100vh - 70px);
   }
   .top-by-pos {
@@ -1092,21 +1106,26 @@ button {
     margin-bottom: 5px;
   }
   .pick-primary {
+    grid-template-columns: auto minmax(0, 1fr);
     padding: 5px;
     gap: 4px;
     row-gap: 3px;
   }
+  .pick-primary .row-badges {
+    grid-column: 1 / -1;
+  }
   .alt-chip {
+    grid-template-columns: auto minmax(0, 1fr);
     font-size: 10px;
-    padding: 2px 3px;
+    padding: 3px 4px;
+  }
+  .alt-chip .row-badges {
+    grid-column: 1 / -1;
   }
   .alternates-label {
     font-size: 10px;
   }
 
-  /* Master list column: only ~118px wide, so keep it to rank + tier + name + state —
-     SOS/red-zone/injury badges don't fit next to a name here without wrapping past
-     the edge, so they're dropped from this column only (still shown everywhere else). */
   .board-toolbar {
     gap: 6px;
   }
@@ -1127,24 +1146,18 @@ button {
     gap: 3px;
   }
   .board-row {
-    grid-template-columns: 20px 20px minmax(0, 1fr) auto;
-    padding: 5px 6px;
-    font-size: 10.5px;
-    column-gap: 5px;
+    padding: 6px 8px;
+    font-size: 11px;
+    column-gap: 6px;
   }
   .board-row .rank {
-    font-size: 9px;
-  }
-  .board-row .row-badges {
-    display: none;
-  }
-  .board-row .pmeta {
     font-size: 10px;
   }
-  .tier-badge {
-    min-width: 18px;
-    height: 15px;
-    font-size: 9px;
+  .board-row .pmeta,
+  .board-row .row-meta .sos-badge,
+  .board-row .row-meta .redzone-badge,
+  .board-row .row-meta .injury-badge {
+    font-size: 10px;
   }
 }
 
