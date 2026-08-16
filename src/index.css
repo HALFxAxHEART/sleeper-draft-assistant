@@ -1054,6 +1054,11 @@ button {
   .pick-cards {
     grid-template-columns: 1fr;
   }
+  /* At 4-up (the >460px default), phone-width cells only have ~80px to work with and
+     names get chopped to 2-3 letters ("Jos…"). 2-up gives real room to read a name. */
+  .top-by-pos {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 720px) {
@@ -1069,10 +1074,16 @@ button {
 
 @media (max-width: 720px) {
   .settings-panel {
+    /* Full-screen takeover rather than offsetting below the header by a guessed pixel
+       height — the header wraps to 2-3 rows at narrow widths, so a fixed top offset either
+       leaves a sliver of header showing through or clips content. The panel's own "Back"
+       button is the way out, so nothing is lost by covering the header too. */
     position: fixed;
-    inset: 60px 0 0 0;
+    inset: 0;
     width: auto;
     z-index: 10;
     max-height: none;
+    overflow-y: auto;
+    padding-top: max(16px, env(safe-area-inset-top));
   }
 }
