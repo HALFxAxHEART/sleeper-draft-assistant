@@ -25,8 +25,10 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
         <button key={alt.id} className="alt-chip" onClick={() => onPick(alt.id)} title="Click to mark as drafted by you instead">
           <TierBadge tier={alt.tier} />
           <span className="alt-name">{alt.name}</span>
-          <RedZoneBadge player={alt} />
-          <InjuryBadge id={alt.id} />
+          <span className="row-badges">
+            <RedZoneBadge player={alt} />
+            <InjuryBadge id={alt.id} />
+          </span>
           <span className="muted alt-meta">
             {alt.position} · {alt.team} · Bye {TEAM_CONTEXT[alt.team]?.bye ?? "?"}
           </span>
@@ -79,12 +81,14 @@ export function UpcomingPicks() {
               <button className="pick-primary" onClick={() => markMine(rec.primary!.id)} title="Click to mark as drafted by you">
                 <TierBadge tier={rec.primary.tier} />
                 <span className="pname">{rec.primary.name}</span>
+                <span className="row-badges">
+                  <SOSBadge team={rec.primary.team} />
+                  <RedZoneBadge player={rec.primary} />
+                  <InjuryBadge id={rec.primary.id} />
+                </span>
                 <span className="pmeta">
                   {rec.primary.position} · {rec.primary.team} · Bye {TEAM_CONTEXT[rec.primary.team]?.bye ?? "?"}
                 </span>
-                <SOSBadge team={rec.primary.team} />
-                <RedZoneBadge player={rec.primary} />
-                <InjuryBadge id={rec.primary.id} />
               </button>
             ) : (
               <div className="pick-primary empty">No players left</div>

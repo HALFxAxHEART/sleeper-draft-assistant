@@ -57,17 +57,15 @@ export function PlayerBoard() {
             <span className="rank">#{p.overallRank}</span>
             <TierBadge tier={p.tier} />
             <span className="pname">{p.name}</span>
+            <span className="row-badges">
+              <SOSBadge team={p.team} />
+              <RedZoneBadge player={p} />
+              <InjuryBadge id={p.id} />
+            </span>
+            <span className={`state-tag ${p.state}`}>{p.state === "available" ? "" : p.state === "mine" ? "MINE" : "picked"}</span>
             <span className={`pmeta ${wouldClash ? "bye-clash" : ""}`}>
               {p.position} · {p.team} · Bye {bye ?? "?"}
             </span>
-            <span className="pos-rank muted">
-              {p.position}
-              {p.positionRank}
-            </span>
-            <SOSBadge team={p.team} />
-            <RedZoneBadge player={p} />
-            <InjuryBadge id={p.id} />
-            <span className={`state-tag ${p.state}`}>{p.state === "available" ? "" : p.state === "mine" ? "MINE" : "picked"}</span>
           </button>
           );
         })}

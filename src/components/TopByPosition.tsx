@@ -23,8 +23,10 @@ export function TopByPosition() {
             >
               <TierBadge tier={e.player.tier} />
               <span className="tbp-name">{e.player.name}</span>
-              <RedZoneBadge player={e.player} />
-              <span className="tbp-team muted">{e.player.team}</span>
+              <span className="row-badges">
+                <RedZoneBadge player={e.player} />
+                <span className="tbp-team muted">{e.player.team}</span>
+              </span>
             </button>
           ) : (
             <div className="tbp-player empty">None left</div>

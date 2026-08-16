@@ -292,8 +292,7 @@ button {
 .tbp-player {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 6px;
+  gap: 6px;
   width: 100%;
   background: transparent;
   border: none;
@@ -313,13 +312,22 @@ button {
 .tbp-name {
   font-weight: 600;
   flex: 1 1 auto;
-  min-width: 44px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .tbp-team {
   font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* Shared trailing badge cluster — keeps badges lined up at a fixed spot on every row
+   instead of drifting sideways with each row's name length. */
+.row-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -414,11 +422,11 @@ button {
 }
 
 .pick-primary {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  flex-wrap: wrap;
+  column-gap: 8px;
   row-gap: 4px;
-  gap: 8px;
   width: 100%;
   background: var(--panel-2);
   border: 1px solid var(--border);
@@ -437,8 +445,7 @@ button {
 }
 .pick-primary .pname {
   font-weight: 600;
-  flex: 1 1 60px;
-  min-width: 60px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -446,7 +453,7 @@ button {
 .pick-primary .pmeta {
   font-size: 12px;
   color: var(--text-dim);
-  flex-basis: 100%;
+  grid-column: 1 / -1;
 }
 
 .scarcity {
@@ -483,11 +490,11 @@ button {
 .alt-chip {
   font-size: 12px;
   color: var(--text-dim);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  flex-wrap: wrap;
+  column-gap: 6px;
   row-gap: 2px;
-  gap: 6px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -499,14 +506,13 @@ button {
 .alt-name {
   color: var(--text);
   font-weight: 600;
-  flex: 1 1 50px;
-  min-width: 50px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .alt-meta {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
 }
 .alt-chip:hover {
   border-color: var(--border);
@@ -658,11 +664,11 @@ button {
 }
 
 .board-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 32px auto minmax(0, 1fr) auto auto;
   align-items: center;
-  flex-wrap: wrap;
+  column-gap: 8px;
   row-gap: 4px;
-  gap: 8px;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -677,13 +683,10 @@ button {
 }
 .board-row .rank {
   color: var(--text-dim);
-  width: 32px;
-  flex-shrink: 0;
   font-size: 12px;
 }
 .board-row .pname {
   font-weight: 600;
-  flex: 1 1 60px;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -691,18 +694,15 @@ button {
 }
 .board-row .pmeta {
   color: var(--text-dim);
-  flex-basis: 100%;
+  grid-column: 1 / -1;
   font-size: 12px;
 }
 .board-row .pmeta.bye-clash {
   color: var(--danger);
   font-weight: 600;
 }
-.board-row .pos-rank {
-  display: none;
-}
 .board-row .state-tag {
-  margin-left: auto;
+  justify-self: end;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -1056,8 +1056,5 @@ button {
     width: auto;
     z-index: 10;
     max-height: none;
-  }
-  .board-row {
-    flex-wrap: wrap;
   }
 }
