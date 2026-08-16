@@ -20,15 +20,17 @@ function Shell() {
         {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
         <main className="app-main">
           {view === "draft" ? (
-            <div className="draft-layout">
-              <div className="draft-left">
-                <TopByPosition />
-                <UpcomingPicks />
+            <>
+              <TopByPosition />
+              <div className="draft-layout">
+                <div className="draft-left">
+                  <UpcomingPicks />
+                </div>
+                <div className="draft-right">
+                  <PlayerBoard />
+                </div>
               </div>
-              <div className="draft-right">
-                <PlayerBoard />
-              </div>
-            </div>
+            </>
           ) : (
             <DraftReview />
           )}

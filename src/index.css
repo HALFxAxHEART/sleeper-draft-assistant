@@ -290,9 +290,14 @@ button {
 }
 
 .tbp-player {
-  display: flex;
+  /* Grid, not a single flex row: the red-zone/team badges used to sit inline right after
+     the name and eat into its space first, so names truncated hard ("Bij…") even in
+     cells with plenty of room. Badges now get their own line below the name instead. */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
+  column-gap: 6px;
+  row-gap: 3px;
   width: 100%;
   background: transparent;
   border: none;
@@ -309,9 +314,11 @@ button {
   color: var(--text-dim);
   cursor: default;
 }
+.tbp-player .row-badges {
+  grid-column: 1 / -1;
+}
 .tbp-name {
   font-weight: 600;
-  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -631,6 +638,7 @@ button {
 
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 .tab {
@@ -996,8 +1004,12 @@ button {
     flex-basis: 230px;
   }
   .top-by-pos {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 5px;
+    /* Now full-width above the two-pane layout (not squeezed into the left column
+       alongside the master list), so it can afford much wider cells than it used to
+       need here — this used to be minmax(80px, ...), which just added more columns
+       instead of giving names room, and truncated everything to 2-3 letters. */
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 6px;
   }
   .tbp-cell {
     padding: 5px 6px;
@@ -1039,25 +1051,100 @@ button {
   }
 }
 
-/* Below this, even shrunk cards don't have room to breathe next to the master list —
-   stack instead: best-by-position, then round picks, then the master board list. */
-@media (max-width: 460px) {
+/* Phone width: best-by-position across the full top, picks and master list stay
+   side by side below it (not stacked) — just shrunk hard enough that both columns
+   actually fit without text spilling past the edge of the screen. */
+@media (max-width: 520px) {
+  .app-header {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .app-main {
+    padding: 6px;
+    gap: 10px;
+  }
   .draft-layout {
-    flex-direction: column;
+    gap: 6px;
   }
   .draft-right {
-    flex-basis: auto;
-    width: 100%;
-    position: static;
-    max-height: none;
+    flex-basis: 118px;
+    max-height: calc(100vh - 70px);
+  }
+  .top-by-pos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .tbp-cell {
+    padding: 4px 5px;
+  }
+  .tbp-player {
+    font-size: 11px;
   }
   .pick-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
   }
-  /* At 4-up (the >460px default), phone-width cells only have ~80px to work with and
-     names get chopped to 2-3 letters ("Jos…"). 2-up gives real room to read a name. */
-  .top-by-pos {
-    grid-template-columns: repeat(2, 1fr);
+  .pick-card {
+    padding: 5px;
+    font-size: 10.5px;
+  }
+  .pick-card-head {
+    margin-bottom: 5px;
+  }
+  .pick-primary {
+    padding: 5px;
+    gap: 4px;
+    row-gap: 3px;
+  }
+  .alt-chip {
+    font-size: 10px;
+    padding: 2px 3px;
+  }
+  .alternates-label {
+    font-size: 10px;
+  }
+
+  /* Master list column: only ~118px wide, so keep it to rank + tier + name + state —
+     SOS/red-zone/injury badges don't fit next to a name here without wrapping past
+     the edge, so they're dropped from this column only (still shown everywhere else). */
+  .board-toolbar {
+    gap: 6px;
+  }
+  .tab {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+  .check {
+    font-size: 11px;
+  }
+  .input {
+    min-width: 0;
+    flex: 1 1 90px;
+    font-size: 12px;
+    padding: 5px 6px;
+  }
+  .board-list {
+    gap: 3px;
+  }
+  .board-row {
+    grid-template-columns: 20px 20px minmax(0, 1fr) auto;
+    padding: 5px 6px;
+    font-size: 10.5px;
+    column-gap: 5px;
+  }
+  .board-row .rank {
+    font-size: 9px;
+  }
+  .board-row .row-badges {
+    display: none;
+  }
+  .board-row .pmeta {
+    font-size: 10px;
+  }
+  .tier-badge {
+    min-width: 18px;
+    height: 15px;
+    font-size: 9px;
   }
 }
 
