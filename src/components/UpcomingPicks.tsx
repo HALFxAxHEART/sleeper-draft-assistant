@@ -5,6 +5,7 @@ import { buildBoard, recommendAllRounds, type BoardPlayer } from "../lib/recomme
 import { TierBadge } from "./TierBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
+import { PpgBadge } from "./PpgBadge";
 import { ByeSummary } from "./ByeSummary";
 import { useDetail } from "../state/detailStore";
 
@@ -35,6 +36,7 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
             {alt.name}
           </span>
           <span className="row-badges">
+            <PpgBadge player={alt} />
             <RedZoneBadge player={alt} />
             <InjuryBadge id={alt.id} />
           </span>
@@ -99,6 +101,7 @@ export function UpcomingPicks() {
                   {rec.primary.name}
                 </span>
                 <span className="row-badges">
+                  <PpgBadge player={rec.primary} />
                   <RedZoneBadge player={rec.primary} />
                   <InjuryBadge id={rec.primary.id} />
                 </span>
