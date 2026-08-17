@@ -121,8 +121,6 @@ export function PlayerDetailModal() {
               .sort((a, b) => b.year - a.year)
               .map((s) => {
                 if (s.weekly.length === 0) return null;
-                const max = Math.max(...s.weekly, 1);
-                const avgPct = Math.max(0, Math.min(100, (s.ppg / max) * 100));
                 return (
                   <div key={s.year} className="weekly-year-block">
                     <div className="weekly-year-head">
@@ -131,17 +129,13 @@ export function PlayerDetailModal() {
                         {s.ppg.toFixed(1)} avg · {s.gamesPlayed} gm
                       </span>
                     </div>
-                    <div className="weekly-chart">
-                      <div className="weekly-avg-line" style={{ bottom: `${avgPct}%` }} />
+                    <div className="weekly-grid">
                       {s.weekly.map((pts, i) => {
-                        const heightPct = Math.max(4, (pts / max) * 100);
                         const above = pts >= s.ppg;
                         return (
-                          <div key={i} className="weekly-bar-wrap" title={`Week ${i + 1}: ${pts.toFixed(1)} pts`}>
-                            <div
-                              className={`weekly-bar ${above ? "above" : "below"}`}
-                              style={{ height: `${heightPct}%` }}
-                            />
+                          <div key={i} className={`weekly-cell ${above ? "above" : "below"}`}>
+                            <span className="weekly-cell-week">W{i + 1}</span>
+                            <span className="weekly-cell-pts">{pts.toFixed(1)}</span>
                           </div>
                         );
                       })}
