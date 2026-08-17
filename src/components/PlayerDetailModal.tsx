@@ -78,10 +78,58 @@ export function PlayerDetailModal() {
           </div>
         </div>
 
-        <div className="modal-section">
-          <h3>Last 2 seasons</h3>
-          <p>{stats ? stats.last2 : "No history on file yet."}</p>
-        </div>
+        {stats ? (
+          <div className="modal-section">
+            <h3>Last 3 seasons</h3>
+            <table className="season-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>PPG</th>
+                  <th>Games</th>
+                  <th>Missed time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.seasons.map((s) => {
+                  const notInLeague = s.gamesPlayed === 0 && s.gamesMissed === 0;
+                  return (
+                    <tr key={s.year}>
+                      <td>{s.year}</td>
+                      <td>{notInLeague ? "—" : s.ppg.toFixed(1)}</td>
+                      <td>
+                        {notInLeague ? "—" : `${s.gamesPlayed}/${s.gamesPlayed + s.gamesMissed}`}
+                      </td>
+                      <td className="season-reason">{s.missedReason ?? "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="modal-section">
+            <h3>Last 3 seasons</h3>
+            <p>No history on file yet.</p>
+          </div>
+        )}
+
+        {stats && stats.weekly2025.length > 0 && (
+          <div className="modal-section">
+            <h3>2025 weekly points</h3>
+            <div className="weekly-chart">
+              {stats.weekly2025.map((pts, i) => {
+                const max = Math.max(...stats.weekly2025, 1);
+                const heightPct = Math.max(4, (pts / max) * 100);
+                return (
+                  <div key={i} className="weekly-bar-wrap" title={`Week ${i + 1}: ${pts.toFixed(1)} pts`}>
+                    <div className="weekly-bar" style={{ height: `${heightPct}%` }} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {rz && (
           <div className="modal-section">

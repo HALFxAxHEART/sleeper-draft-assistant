@@ -781,6 +781,30 @@ button {
   color: var(--text-dim);
 }
 
+/* Position text — colored per-position so QB/RB/WR/TE/K/DST are distinguishable at a
+   glance in meta lines, independent of the tier-badge color (which no longer varies). */
+.pos-text {
+  font-weight: 700;
+}
+.pos-qb {
+  color: #c084fc;
+}
+.pos-rb {
+  color: #34d399;
+}
+.pos-wr {
+  color: #38bdf8;
+}
+.pos-te {
+  color: #fb923c;
+}
+.pos-k {
+  color: #94a3b8;
+}
+.pos-dst {
+  color: #f87171;
+}
+
 /* Player name, clickable on its own to open the detail popup — the rest of the row
    still does the normal draft-pick action, so this needs its own distinct affordance. */
 .info-trigger {
@@ -898,6 +922,49 @@ button {
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
+}
+
+.season-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.season-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  padding: 0 6px 4px 0;
+  font-weight: 600;
+}
+.season-table td {
+  padding: 4px 6px 4px 0;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+.season-table .season-reason {
+  color: var(--text-dim);
+}
+
+.weekly-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 56px;
+}
+.weekly-bar-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  cursor: help;
+}
+.weekly-bar {
+  width: 100%;
+  min-height: 2px;
+  background: var(--accent-2);
+  border-radius: 2px 2px 0 0;
 }
 
 .modal-actions {

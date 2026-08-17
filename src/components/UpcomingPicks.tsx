@@ -6,6 +6,7 @@ import { TierBadge } from "./TierBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
 import { PpgBadge } from "./PpgBadge";
+import { PosText } from "./PosText";
 import { ByeSummary } from "./ByeSummary";
 import { useDetail } from "../state/detailStore";
 
@@ -40,7 +41,7 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
             <RedZoneBadge player={alt} />
             <InjuryBadge id={alt.id} />
           </span>
-          <span className="muted alt-meta">{alt.position} · {alt.team}</span>
+          <span className="muted alt-meta"><PosText position={alt.position} /> · {alt.team}</span>
         </button>
       ))}
       {hiddenCount > 0 && (
@@ -105,7 +106,7 @@ export function UpcomingPicks() {
                   <RedZoneBadge player={rec.primary} />
                   <InjuryBadge id={rec.primary.id} />
                 </span>
-                <span className="pmeta">{rec.primary.position} · {rec.primary.team}</span>
+                <span className="pmeta"><PosText position={rec.primary.position} /> · {rec.primary.team}</span>
               </button>
             ) : (
               <div className="pick-primary empty">No players left</div>

@@ -5,6 +5,7 @@ import { buildBoard } from "../lib/recommend";
 import { buildRosterSlots } from "../lib/roster";
 import type { PickLabel } from "../lib/review";
 import { TierBadge } from "./TierBadge";
+import { PosText } from "./PosText";
 import { useDetail } from "../state/detailStore";
 
 const LABEL_TEXT: Record<PickLabel, string> = {
@@ -47,7 +48,7 @@ export function MyRoster() {
                   </span>
                 </div>
                 <span className="pmeta">
-                  {slot.player.position} · {slot.player.team}
+                  <PosText position={slot.player.position} /> · {slot.player.team}
                 </span>
                 {slot.grade && slot.grade.label !== "ungraded" && (
                   <span className={`roster-slot-grade label-tag-${slot.grade.label}`} title={slot.grade.note}>

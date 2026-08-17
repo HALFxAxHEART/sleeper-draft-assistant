@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { loadArchive, removeDraft, type ArchivedDraft } from "../lib/archive";
 import { reviewDraft, type PickLabel } from "../lib/review";
+import { PosText } from "./PosText";
 
 const STATUS_LABEL: Record<string, string> = {
   complete: "Complete",
@@ -103,7 +104,7 @@ export function DraftReview() {
                         <span className="tp-round">R{g.pick.round}</span>
                         <span className="tp-name">{g.pick.playerName}</span>
                         <span className="tp-pos muted">
-                          {g.pick.position} · {g.pick.nflTeam}
+                          <PosText position={g.pick.position} /> · {g.pick.nflTeam}
                         </span>
                         <span className={`tp-label label-tag-${g.label}`}>{LABEL_TEXT[g.label]}</span>
                         {(g.label === "reach" || g.label === "bad") && <div className="tp-note">{g.note}</div>}

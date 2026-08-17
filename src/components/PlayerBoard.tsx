@@ -6,6 +6,7 @@ import { TierBadge } from "./TierBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
 import { PpgBadge } from "./PpgBadge";
+import { PosText } from "./PosText";
 import { useDetail } from "../state/detailStore";
 
 const TABS: Array<Position | "ALL"> = ["ALL", "QB", "RB", "WR", "TE", "K", "DST"];
@@ -74,7 +75,7 @@ export function PlayerBoard() {
               {state.queue.includes(p.id) ? "★" : "☆"}
             </span>
             <span className="row-meta">
-              <span className="pmeta">{p.position} · {p.team}</span>
+              <span className="pmeta"><PosText position={p.position} /> · {p.team}</span>
               <PpgBadge player={p} />
               <RedZoneBadge player={p} />
               <InjuryBadge id={p.id} />
