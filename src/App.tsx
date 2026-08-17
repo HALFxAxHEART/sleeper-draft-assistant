@@ -9,6 +9,8 @@ import { PlayerBoard } from "./components/PlayerBoard";
 import { DraftReview } from "./components/DraftReview";
 import { TopByPosition } from "./components/TopByPosition";
 import { PlayerDetailModal } from "./components/PlayerDetailModal";
+import { MyRoster } from "./components/MyRoster";
+import { MyQueue } from "./components/MyQueue";
 
 function Shell() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -24,11 +26,13 @@ function Shell() {
           {view === "draft" ? (
             <>
               <TopByPosition />
+              <MyRoster />
               <div className="draft-layout">
                 <div className="draft-left">
                   <UpcomingPicks />
                 </div>
                 <div className="draft-right">
+                  <MyQueue />
                   <PlayerBoard />
                 </div>
               </div>

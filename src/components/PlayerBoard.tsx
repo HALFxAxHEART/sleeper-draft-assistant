@@ -63,6 +63,16 @@ export function PlayerBoard() {
               {p.name}
             </span>
             <span className={`state-tag ${p.state}`}>{p.state === "available" ? "" : p.state === "mine" ? "MINE" : "picked"}</span>
+            <span
+              className={`queue-star ${state.queue.includes(p.id) ? "queued" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "TOGGLE_QUEUE", playerId: p.id });
+              }}
+              title={state.queue.includes(p.id) ? "Remove from queue" : "Add to my queue"}
+            >
+              {state.queue.includes(p.id) ? "★" : "☆"}
+            </span>
             <span className="row-meta">
               <span className="pmeta">{p.position} · {p.team}</span>
               <PpgBadge player={p} />

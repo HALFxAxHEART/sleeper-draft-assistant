@@ -690,7 +690,7 @@ button {
 
 .board-row {
   display: grid;
-  grid-template-columns: 32px auto minmax(0, 1fr) auto;
+  grid-template-columns: 32px auto minmax(0, 1fr) auto auto;
   align-items: center;
   column-gap: 8px;
   row-gap: 4px;
@@ -746,6 +746,21 @@ button {
 }
 .board-row .state-tag.picked {
   color: var(--text-dim);
+}
+
+.queue-star {
+  justify-self: end;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px;
+}
+.queue-star:hover {
+  color: #facc15;
+}
+.queue-star.queued {
+  color: #facc15;
 }
 
 .board-row.state-picked {
@@ -890,6 +905,155 @@ button {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 16px;
+}
+
+/* My roster */
+.my-roster h2 {
+  font-size: 13px;
+  margin: 0 0 8px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.roster-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+}
+.roster-slot {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.roster-slot.grade-best {
+  border-color: var(--ok);
+}
+.roster-slot.grade-solid {
+  border-color: var(--accent);
+}
+.roster-slot.grade-reach {
+  border-color: #fb923c;
+}
+.roster-slot.grade-bad {
+  border-color: var(--danger);
+}
+.roster-slot-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+.roster-slot-player {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.roster-slot-name {
+  font-weight: 600;
+  font-size: 12px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roster-slot .pmeta {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.roster-slot-empty-label {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+.roster-slot-grade {
+  align-self: flex-start;
+  font-size: 9px;
+  margin-top: 1px;
+}
+
+/* My queue */
+.my-queue {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.my-queue-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.queue-row {
+  display: grid;
+  grid-template-columns: 16px auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 3px;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: var(--panel-2);
+}
+.queue-row .queue-badges,
+.queue-row .queue-taken-tag {
+  grid-column: 1 / -1;
+  padding-left: 22px;
+}
+.queue-row.taken {
+  opacity: 0.55;
+}
+.queue-rank {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+.queue-name {
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.queue-taken-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--danger);
+  font-weight: 700;
+}
+.queue-actions {
+  display: flex;
+  gap: 2px;
+}
+.queue-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 4px;
+  font-size: 11px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  padding: 0;
+}
+.queue-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.queue-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 /* Draft review */

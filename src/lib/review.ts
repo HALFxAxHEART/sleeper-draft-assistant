@@ -7,6 +7,7 @@
 // passes over several markedly better players grades as a reach, and we name who was open.
 import type { ArchivedDraft, ArchivedPick } from "./archive";
 import { PLAYERS } from "../data/players";
+import type { PickState } from "./types";
 
 export type PickLabel = "best" | "solid" | "reach" | "bad" | "ungraded";
 
@@ -44,6 +45,60 @@ function letterGrade(avgGap: number | null): string {
   return "F";
 }
 
+export interface GradeResult {
+  label: PickLabel;
+  gap: number | null;
+  note: string;
+}
+
+// Shared by reviewDraft (archived Sleeper-synced picks, graded after the fact) and
+// gradeLivePick (your own manual picks, graded the instant you mark someone "mine") —
+// same gap-to-best-available thresholds either way, so the two views never disagree.
+function gradeAgainstBest(
+  isSkillPosition: boolean,
+  rank: number | null,
+  bestAvailable: { name: string; rank: number; tier: number } | null,
+): GradeResult {
+  if (!isSkillPosition) {
+    return { label: "solid", gap: null, note: "Depth/streaming pick — not graded against the skill-position board." };
+  }
+  if (rank == null || !bestAvailable) {
+    return { label: "ungraded", gap: null, note: "Not in our ranked board — no grade available." };
+  }
+  const gap = Math.max(0, rank - bestAvailable.rank);
+  if (gap <= 4) {
+    return {
+      label: "best",
+      gap,
+      note: gap === 0 ? "Took the best player on the board." : `Right there with the best available (${bestAvailable.name}, Tier ${bestAvailable.tier}).`,
+    };
+  }
+  if (gap <= 14) {
+    return { label: "solid", gap, note: `Solid — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was arguably a touch better.` };
+  }
+  if (gap <= 30) {
+    return { label: "reach", gap, note: `Reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still on the board, better value.` };
+  }
+  return { label: "bad", gap, note: `Big reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still available. That's a much stronger pick.` };
+}
+
+// Grades one of YOUR picks the instant it happens, using the board state from just
+// before this player was marked "mine" (so it reflects what was truly still available).
+export function gradeLivePick(playerId: string, priorPickStates: Record<string, PickState>): GradeResult {
+  const info = RANK_BY_ID.get(playerId);
+  const isSkillPosition = info ? info.position !== "K" && info.position !== "DST" : true;
+
+  let bestAvailable: { name: string; rank: number; tier: number } | null = null;
+  if (isSkillPosition) {
+    const best = SKILL_POOL.find((p) => p.id !== playerId && (priorPickStates[p.id] ?? "available") === "available");
+    if (best) {
+      const bestInfo = RANK_BY_ID.get(best.id)!;
+      bestAvailable = { name: best.name, rank: bestInfo.rank, tier: bestInfo.tier };
+    }
+  }
+  return gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAvailable);
+}
+
 export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
   const picks = [...archived.picks].sort((a, b) => a.overall - b.overall);
   const takenSkill = new Set<string>();
@@ -62,29 +117,7 @@ export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
       }
     }
 
-    let label: PickLabel = "ungraded";
-    let gap: number | null = null;
-    let note = "Not in our ranked board — no grade available.";
-
-    if (!isSkillPosition) {
-      label = "solid";
-      note = "Depth/streaming pick — not graded against the skill-position board.";
-    } else if (info && bestAvailable) {
-      gap = Math.max(0, info.rank - bestAvailable.rank);
-      if (gap <= 4) {
-        label = "best";
-        note = gap === 0 ? "Took the best player on the board." : `Right there with the best available (${bestAvailable.name}, Tier ${bestAvailable.tier}).`;
-      } else if (gap <= 14) {
-        label = "solid";
-        note = `Solid — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was arguably a touch better.`;
-      } else if (gap <= 30) {
-        label = "reach";
-        note = `Reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still on the board, better value.`;
-      } else {
-        label = "bad";
-        note = `Big reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still available. That's a much stronger pick.`;
-      }
-    }
+    const { label, gap, note } = gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAvailable);
 
     const grade: PickGrade = { pick, rank: info?.rank ?? null, tier: info?.tier ?? null, bestAvailable, gap, label, note };
 
