@@ -114,20 +114,41 @@ export function PlayerDetailModal() {
           </div>
         )}
 
-        {stats && stats.weekly2025.length > 0 && (
+        {stats && stats.seasons.some((s) => s.weekly.length > 0) && (
           <div className="modal-section">
-            <h3>2025 weekly points</h3>
-            <div className="weekly-chart">
-              {stats.weekly2025.map((pts, i) => {
-                const max = Math.max(...stats.weekly2025, 1);
-                const heightPct = Math.max(4, (pts / max) * 100);
+            <h3>Weekly points</h3>
+            {[...stats.seasons]
+              .sort((a, b) => b.year - a.year)
+              .map((s) => {
+                if (s.weekly.length === 0) return null;
+                const max = Math.max(...s.weekly, 1);
+                const avgPct = Math.max(0, Math.min(100, (s.ppg / max) * 100));
                 return (
-                  <div key={i} className="weekly-bar-wrap" title={`Week ${i + 1}: ${pts.toFixed(1)} pts`}>
-                    <div className="weekly-bar" style={{ height: `${heightPct}%` }} />
+                  <div key={s.year} className="weekly-year-block">
+                    <div className="weekly-year-head">
+                      <span className="weekly-year-label">{s.year}</span>
+                      <span className="weekly-year-meta">
+                        {s.ppg.toFixed(1)} avg · {s.gamesPlayed} gm
+                      </span>
+                    </div>
+                    <div className="weekly-chart">
+                      <div className="weekly-avg-line" style={{ bottom: `${avgPct}%` }} />
+                      {s.weekly.map((pts, i) => {
+                        const heightPct = Math.max(4, (pts / max) * 100);
+                        const above = pts >= s.ppg;
+                        return (
+                          <div key={i} className="weekly-bar-wrap" title={`Week ${i + 1}: ${pts.toFixed(1)} pts`}>
+                            <div
+                              className={`weekly-bar ${above ? "above" : "below"}`}
+                              style={{ height: `${heightPct}%` }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}
-            </div>
           </div>
         )}
 

@@ -947,11 +947,45 @@ button {
   color: var(--text-dim);
 }
 
+.weekly-year-block {
+  margin-bottom: 10px;
+}
+.weekly-year-block:last-child {
+  margin-bottom: 0;
+}
+.weekly-year-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+.weekly-year-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+.weekly-year-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
 .weekly-chart {
+  position: relative;
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 56px;
+  height: 44px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 3px 0;
+}
+.weekly-avg-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--text-dim);
+  opacity: 0.6;
+  pointer-events: none;
 }
 .weekly-bar-wrap {
   flex: 1;
@@ -963,8 +997,14 @@ button {
 .weekly-bar {
   width: 100%;
   min-height: 2px;
-  background: var(--accent-2);
   border-radius: 2px 2px 0 0;
+}
+.weekly-bar.above {
+  background: var(--accent-2);
+}
+.weekly-bar.below {
+  background: var(--text-dim);
+  opacity: 0.55;
 }
 
 .modal-actions {
