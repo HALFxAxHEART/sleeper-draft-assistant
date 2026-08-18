@@ -18,15 +18,15 @@ export const DEFAULT_ROSTER: RosterSlots = {
   RB: 2,
   WR: 2,
   TE: 1,
-  FLEX: 2,
+  FLEX: 1,
   K: 1,
   DST: 1,
   BENCH: 6,
 };
 
-// 9-man leagues and under run 2 FLEX spots; 10-man and up run 1.
+// 9-man leagues and up run 2 FLEX spots; 8-man and under run 1.
 export function flexForTeams(teams: number): number {
-  return teams <= 9 ? 2 : 1;
+  return teams >= 9 ? 2 : 1;
 }
 
 export type StrategySlot = Position | "FLEX" | "BEST";
