@@ -1,6 +1,6 @@
 import { useDraft } from "../state/draftStore";
 import type { RosterSlots } from "../lib/types";
-import { totalRounds } from "../lib/types";
+import { scaleRoster, totalRounds } from "../lib/types";
 import { StrategyEditor } from "./StrategyEditor";
 
 const ROSTER_FIELDS: Array<{ key: keyof RosterSlots; label: string }> = [
@@ -21,6 +21,12 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   function setRoster(key: keyof RosterSlots, value: number) {
     const roster = { ...settings.roster, [key]: Math.max(0, value) };
     dispatch({ type: "SET_ROSTER", roster });
+  }
+
+  function toggleDoubles(checked: boolean) {
+    const roster = scaleRoster(settings.roster, checked ? 2 : 0.5);
+    dispatch({ type: "SET_ROSTER", roster });
+    dispatch({ type: "SET_SETTINGS", settings: { doubles: checked } });
   }
 
   return (
@@ -61,6 +67,14 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             <option>Half PPR</option>
             <option>Standard</option>
           </select>
+        </label>
+        <label className="field checkbox-field">
+          <input
+            type="checkbox"
+            checked={settings.doubles}
+            onChange={(e) => toggleDoubles(e.target.checked)}
+          />
+          <span>Doubles league (2 managers per team — doubles every roster slot)</span>
         </label>
       </section>
 

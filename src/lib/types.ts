@@ -30,6 +30,7 @@ export interface DraftSettings {
   teams: number;
   slot: number; // 1-indexed draft position
   roster: RosterSlots;
+  doubles: boolean; // 2 managers sharing one team -> every roster slot doubled
   scoring: "PPR" | "Half PPR" | "Standard";
   strategy: StrategySlot[]; // one entry per round, length == totalRounds()
   sleeperDraftId: string;
@@ -40,6 +41,14 @@ export function totalRounds(roster: RosterSlots): number {
   return (
     roster.QB + roster.RB + roster.WR + roster.TE + roster.FLEX + roster.K + roster.DST + roster.BENCH
   );
+}
+
+export function scaleRoster(roster: RosterSlots, factor: number): RosterSlots {
+  const out = { ...roster };
+  for (const key of Object.keys(out) as (keyof RosterSlots)[]) {
+    out[key] = Math.max(0, Math.round(out[key] * factor));
+  }
+  return out;
 }
 
 const DEFAULT_STRATEGY_CYCLE: StrategySlot[] = [
@@ -73,6 +82,7 @@ export function defaultSettings(): DraftSettings {
     teams: 8,
     slot: 1,
     roster,
+    doubles: false,
     scoring: "PPR",
     strategy: defaultStrategy(totalRounds(roster)),
     sleeperDraftId: "",

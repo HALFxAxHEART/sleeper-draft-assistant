@@ -193,6 +193,18 @@ button {
 .field.small input {
   width: 60px;
 }
+.field.checkbox-field {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.field.checkbox-field input {
+  width: auto;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.field.checkbox-field span {
+  flex: 1;
+}
 
 .roster-grid {
   display: grid;
