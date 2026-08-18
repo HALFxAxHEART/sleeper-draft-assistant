@@ -1,6 +1,6 @@
 import { useDraft } from "../state/draftStore";
 import type { RosterSlots } from "../lib/types";
-import { scaleRoster, totalRounds } from "../lib/types";
+import { flexForTeams, scaleRoster, totalRounds } from "../lib/types";
 import { StrategyEditor } from "./StrategyEditor";
 
 const ROSTER_FIELDS: Array<{ key: keyof RosterSlots; label: string }> = [
@@ -29,6 +29,15 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     dispatch({ type: "SET_SETTINGS", settings: { doubles: checked } });
   }
 
+  function setTeams(value: number) {
+    const teams = value || settings.teams;
+    dispatch({ type: "SET_SETTINGS", settings: { teams } });
+    const flex = flexForTeams(teams) * (settings.doubles ? 2 : 1);
+    if (flex !== settings.roster.FLEX) {
+      dispatch({ type: "SET_ROSTER", roster: { ...settings.roster, FLEX: flex } });
+    }
+  }
+
   return (
     <aside className="settings-panel">
       <button className="btn ghost settings-back" onClick={onClose}>
@@ -44,7 +53,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             min={2}
             max={20}
             value={settings.teams}
-            onChange={(e) => dispatch({ type: "SET_SETTINGS", settings: { teams: Number(e.target.value) || settings.teams } })}
+            onChange={(e) => setTeams(Number(e.target.value))}
           />
         </label>
         <label className="field">
