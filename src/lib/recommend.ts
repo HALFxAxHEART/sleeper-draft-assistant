@@ -73,8 +73,34 @@ export function redZoneBadgeInfo(p: BoardPlayer): { pct: number; note: string; s
   return { pct: info.pct, note: info.note, standout: info.pct - baseline >= 10 };
 }
 
+// When two players are close enough to be a toss-up, prefer the RB. Workhorse RB touches
+// are scarce and the position craters hard after the first couple tiers, while WR depth
+// runs deep enough that a good one is still findable several rounds later — so with picks
+// this close, taking the RB first is the better bet. Only kicks in within a tight window;
+// outside it, the underlying rank (tier, injury, red-zone share) still wins outright.
+const RB_PREFERENCE_WINDOW = 3;
+
 export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
-  return [...players].sort((a, b) => effectiveRank(a) - effectiveRank(b));
+  const sorted = [...players].sort((a, b) => effectiveRank(a) - effectiveRank(b));
+
+  // Bubble each RB up past any immediately preceding WR(s) that are within the toss-up
+  // window of THAT RB specifically (not chained through intermediate swaps) — so a close
+  // call gets reordered, but a real tier gap (e.g. an elite WR well ahead of a mid RB)
+  // still holds.
+  for (let i = 1; i < sorted.length; i++) {
+    let j = i;
+    while (
+      j > 0 &&
+      sorted[j].position === "RB" &&
+      sorted[j - 1].position === "WR" &&
+      effectiveRank(sorted[j]) - effectiveRank(sorted[j - 1]) <= RB_PREFERENCE_WINDOW
+    ) {
+      [sorted[j - 1], sorted[j]] = [sorted[j], sorted[j - 1]];
+      j--;
+    }
+  }
+
+  return sorted;
 }
 
 function slotMatches(slot: StrategySlot, position: Position): boolean {
