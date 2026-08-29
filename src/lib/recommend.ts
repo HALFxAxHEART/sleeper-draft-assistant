@@ -51,9 +51,13 @@ function injuryPenalty(playerId: string): number {
 // wash; only real red-zone hogs get boosted, scaled per-position since RB touch shares run
 // much higher than WR/TE target shares by nature (a 55% RB share and a 22% WR share can both
 // mean "clear #1 in the offense"). Capped so it nudges, not overrides, the underlying tier.
+// Dialed back so red-zone is a genuine nudge, not an override: the old (0.6/1.3/1.5, cap 20)
+// was strong enough to leap a consensus RB6-8 (Taylor, 72% RZ) over the consensus RB1 (Gibbs,
+// 58%), which is wrong — expert consensus should stay the primary driver. These weights keep
+// the RB1 tier (Bijan > Gibbs > Taylor > CMC) intact while still rewarding true RZ hogs.
 const REDZONE_BASELINE: Partial<Record<Position, number>> = { RB: 40, WR: 16, TE: 13 };
-const REDZONE_MULTIPLIER: Partial<Record<Position, number>> = { RB: 0.6, WR: 1.3, TE: 1.5 };
-const REDZONE_CAP = 20;
+const REDZONE_MULTIPLIER: Partial<Record<Position, number>> = { RB: 0.45, WR: 0.6, TE: 0.8 };
+const REDZONE_CAP = 14;
 function redZoneBonus(p: BoardPlayer): number {
   const info = RED_ZONE_SHARE[p.id];
   const baseline = REDZONE_BASELINE[p.position];
