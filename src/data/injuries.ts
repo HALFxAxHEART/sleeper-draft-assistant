@@ -37,7 +37,7 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
   [playerId("Chris Olave", "WR")]: entry("prone", 0, "History of concussions plus a lung blood clot that ended his 2025 season"),
   [playerId("Rashee Rice", "WR")]: entry("prone", 0, "Major 2024 knee reconstruction; minor knee clean-up surgery in May 2026"),
   [playerId("DeVonta Smith", "WR")]: entry("prone", 0, "Recurring hamstring issues in 2024 and again in 2026 training camp"),
-  [playerId("Malik Nabers", "WR")]: entry("long_out", 8, "Recovering from a 2025 ACL tear plus revision surgery; no clear return timeline"),
+  [playerId("Malik Nabers", "WR")]: entry("long_out", 1, "Off a 2025 ACL/meniscus tear but trending toward Week 1 — avoided PUP, slight opener risk, not a long absence"),
   [playerId("Kyren Williams", "RB")]: entry("prone", 0, "Recurring ankle issues in 2023 and again late in 2025 season"),
   [playerId("Tee Higgins", "WR")]: entry("prone", 0, "Recurring hamstring injuries in 2023-2024; dealt with concussions in 2025"),
 
@@ -89,7 +89,7 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
   [playerId("Matthew Stafford", "QB")]: entry("prone", 0, "Recurring back/disc issues limited camp reps; expected to play"),
   [playerId("Jonathon Brooks", "RB")]: entry("prone", 0, "Two ACL tears in the past two years; now taking on more camp reps as Chuba Hubbard deals with a hamstring injury"),
   [playerId("Jordan Addison", "WR")]: entry("prone", 0, "History of recurring ankle injuries; minor camp thumb injury now"),
-  [playerId("George Kittle", "TE")]: entry("long_out", 6, "Recovering from an Achilles tear suffered in the Jan 2026 playoffs, on the PUP list"),
+  [playerId("George Kittle", "TE")]: entry("long_out", 1, "Activated off PUP (2025 Achilles); Week 1 a distinct possibility, game-time decision — no longer a multi-week absence"),
   [playerId("Rachaad White", "RB")]: entry("prone", 0, "History of minor ankle, foot, and groin injuries"),
   [playerId("Jakobi Meyers", "WR")]: entry("prone", 0, "History of concussions, knee, ankle, and toe injuries in recent seasons"),
   [playerId("Jacory Croskey-Merritt", "RB")]: entry("prone", 0, "Missed camp time this offseason with a soft-tissue injury"),
@@ -113,7 +113,7 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
 
   // --- Added from Aug 25, 2026 news refresh ---
   [playerId("Jayden Higgins", "WR")]: entry("long_out", 17, "Torn ACL in Aug 2026 camp — done for the entire 2026 season"),
-  [playerId("Zach Charbonnet", "RB")]: entry("prone", 0, "Managing a knee issue on the Active/PUP list; targeting a Week 1-ish return, which opened the door for Jadarian Price to grab first-team reps"),
+  [playerId("Zach Charbonnet", "RB")]: entry("long_out", 4, "On PUP recovering from ACL surgery — misses at least the first 4 games, with some risk it runs later"),
   [playerId("Jeremiyah Love", "RB")]: entry("long_out", 3, "High-ankle sprain in Aug 2026 camp, expected out several weeks; currently behind Tyler Allgeier and James Conner on Arizona's depth chart"),
   [playerId("Ashton Jeanty", "RB")]: entry("prone", 0, "Ankle sprain in Aug 2026 camp; trending better but Week 1 workload still uncertain"),
   [playerId("TreVeyon Henderson", "RB")]: entry("prone", 0, "Minor ankle issue in Aug 2026 camp, called a minor concern"),
@@ -126,7 +126,7 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
 
   // --- Extended depth additions (top 248-400) ---
   [playerId("Kendre Miller", "RB")]: entry("prone", 0, "recurring knee-hamstring issues have limited practice availability"),
-  [playerId("Trey Benson", "RB")]: entry("long_out", 6, "missed time in 2025 recovering from a knee injury"),
+  [playerId("Trey Benson", "RB")]: entry("long_out", 17, "Waived Aug 24 2026 with a knee flare-up and reverted to IR — out for the entire season"),
   [playerId("Elijah Mitchell", "RB")]: entry("prone", 0, "chronic hamstring and ankle injuries have repeatedly cost him time"),
   [playerId("Evan Hull", "RB")]: entry("long_out", 5, "missed games in 2025 with a knee injury"),
   [playerId("Marlon Mack", "RB")]: entry("prone", 0, "injury history, past ACL tear"),
@@ -136,7 +136,8 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
   [playerId("Jalin Hyatt", "WR")]: entry("long_out", 3, "hamstring strain"),
   [playerId("Zay Jones", "WR")]: entry("prone", 0, "recurring lower-body injuries have limited his availability"),
   [playerId("Erik Ezukanma", "WR")]: entry("long_out", 6, "missed roughly six games in 2025 with a concussion/lower-body injury"),
-  [playerId("Luke Musgrave", "TE")]: entry("prone", 0, "recurring hamstring tightness has periodically limited practice reps"),
+  [playerId("Luke Musgrave", "TE")]: entry("long_out", 4, "On PUP with a neck injury and an uncertain timeline — misses at least the first 4 games"),
+  [playerId("Ricky Pearsall", "WR")]: entry("long_out", 17, "Placed on IR Aug 1 2026 after season-ending PCL knee surgery — out for the entire season"),
   [playerId("Foster Moreau", "TE")]: entry("long_out", 3, "offseason hip procedure limited camp and early-season workload"),
   [playerId("Will Levis", "QB")]: entry("prone", 0, "shoulder soreness that flares up under contact"),
   [playerId("Joe Milton III", "QB")]: entry("long_out", 3, "thumb injury that limited offseason and camp reps"),
