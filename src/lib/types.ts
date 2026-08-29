@@ -86,9 +86,9 @@ export function defaultStrategy(rounds: number): StrategySlot[] {
 export function defaultSettings(): DraftSettings {
   const roster = DEFAULT_ROSTER;
   return {
-    // Michel's league is a 12-team, single-FLEX redraft; teams/slot auto-correct to whatever
+    // Michel's league is a 10-team, single-FLEX redraft; teams/slot auto-correct to whatever
     // the Sleeper draft reports once he connects, so this is just a sensible starting point.
-    teams: 12,
+    teams: 10,
     slot: 1,
     roster,
     doubles: false,
