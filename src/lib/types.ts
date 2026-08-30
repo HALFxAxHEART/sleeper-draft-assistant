@@ -18,17 +18,17 @@ export const DEFAULT_ROSTER: RosterSlots = {
   RB: 2,
   WR: 2,
   TE: 1,
-  FLEX: 1,
+  FLEX: 2, // Michel's league runs 2 FLEX (16-round rosters)
   K: 1,
   DST: 1,
   BENCH: 6,
 };
 
-// Single FLEX is the standard Sleeper redraft default (Michel's 12-man league included), so
-// changing team count never forces a second FLEX. Leagues that actually run two FLEX spots
-// set the FLEX field manually in Settings (and the "doubles" toggle still doubles it).
+// FLEX count is a league setting the user controls (Michel's league runs 2), NOT something
+// derived from team count — changing the number of teams never touches FLEX anymore. Kept for
+// backwards compat / any caller that still wants a default; returns the roster default.
 export function flexForTeams(_teams: number): number {
-  return 1;
+  return DEFAULT_ROSTER.FLEX;
 }
 
 export type StrategySlot = Position | "FLEX" | "BEST";
@@ -86,10 +86,10 @@ export function defaultStrategy(rounds: number): StrategySlot[] {
 export function defaultSettings(): DraftSettings {
   const roster = DEFAULT_ROSTER;
   return {
-    // Michel's league is a 10-team, single-FLEX redraft; teams/slot auto-correct to whatever
-    // the Sleeper draft reports once he connects, so this is just a sensible starting point.
-    teams: 10,
-    slot: 1,
+    // Michel's league is an 8-team, 2-FLEX redraft and he drafts 8th; teams/slot auto-correct
+    // to whatever the Sleeper draft reports once he connects, so this is just the starting point.
+    teams: 8,
+    slot: 8,
     roster,
     doubles: false,
     scoring: "PPR",

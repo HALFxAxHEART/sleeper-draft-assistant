@@ -1,6 +1,6 @@
 import { useDraft } from "../state/draftStore";
 import type { RosterSlots } from "../lib/types";
-import { flexForTeams, scaleRoster, totalRounds } from "../lib/types";
+import { scaleRoster, totalRounds } from "../lib/types";
 import { StrategyEditor } from "./StrategyEditor";
 
 const ROSTER_FIELDS: Array<{ key: keyof RosterSlots; label: string }> = [
@@ -30,12 +30,9 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   }
 
   function setTeams(value: number) {
-    const teams = value || settings.teams;
-    dispatch({ type: "SET_SETTINGS", settings: { teams } });
-    const flex = flexForTeams(teams) * (settings.doubles ? 2 : 1);
-    if (flex !== settings.roster.FLEX) {
-      dispatch({ type: "SET_ROSTER", roster: { ...settings.roster, FLEX: flex } });
-    }
+    // FLEX is a league setting the user controls — changing team count must NOT stomp it
+    // (Michel's league runs 2 FLEX; the old auto-derive kept forcing it back).
+    dispatch({ type: "SET_SETTINGS", settings: { teams: value || settings.teams } });
   }
 
   return (

@@ -6,7 +6,7 @@ import { gradeLivePick, type GradeResult } from "../lib/review";
 // Bumped v1 -> v2 for the 12-team / single-FLEX default change: discards any stale saved
 // config (e.g. a 2-FLEX roster left over from the old team-count rule) so everyone loads the
 // corrected defaults. Saved past-draft reviews live under a separate archive key, untouched.
-const STORAGE_KEY = "sleeper-draft-assistant/v2";
+const STORAGE_KEY = "sleeper-draft-assistant/v3";
 
 interface State {
   settings: DraftSettings;
