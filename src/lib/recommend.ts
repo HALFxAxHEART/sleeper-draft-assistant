@@ -70,6 +70,15 @@ export function effectiveRank(p: BoardPlayer): number {
   return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p);
 }
 
+// A player who can't play a meaningful chunk of the season (season-ending injury, or the
+// commissioner's-exempt/suspended list — out more than half the year) should never be
+// recommended or simulated as a rival's pick. They still appear on the full player board
+// (with the OUT badge) so you can see the situation; they just aren't offered as a pick.
+export function isRosterable(p: BoardPlayer): boolean {
+  const inj = INJURY_INFO[p.id];
+  return !(inj && inj.risk === "long_out" && inj.gamesOut > 8);
+}
+
 export function redZoneBadgeInfo(p: BoardPlayer): { pct: number; note: string; standout: boolean } | null {
   const info = RED_ZONE_SHARE[p.id];
   if (!info) return null;
@@ -142,7 +151,7 @@ export interface TopByPositionEntry {
 // Best available player at each position right now, independent of round/strategy — a
 // quick "who's the best X left" reference regardless of what you're actually targeting.
 export function topAvailableByPosition(board: BoardPlayer[]): TopByPositionEntry[] {
-  const ranked = byEffectiveRank(board.filter((p) => p.state === "available"));
+  const ranked = byEffectiveRank(board.filter((p) => p.state === "available" && isRosterable(p)));
   const positions: Position[] = ["QB", "RB", "WR", "TE", "K", "DST"];
   const entries: TopByPositionEntry[] = positions.map((pos) => ({
     label: pos,
@@ -179,7 +188,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
   // that's enough to know which overall pick number comes next.
   const realTakenCount = board.filter((p) => p.state !== "available").length;
 
-  const pool = board.filter((p) => p.state === "available").sort((a, b) => a.overallRank - b.overallRank);
+  const pool = board.filter((p) => p.state === "available" && isRosterable(p)).sort((a, b) => a.overallRank - b.overallRank);
   const simulatedTaken = new Set<string>();
   const myPlayers: BoardPlayer[] = board.filter((p) => p.state === "mine");
 

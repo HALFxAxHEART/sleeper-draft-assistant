@@ -7,7 +7,17 @@
 // passes over several markedly better players grades as a reach, and we name who was open.
 import type { ArchivedDraft, ArchivedPick } from "./archive";
 import { PLAYERS } from "../data/players";
+import { INJURY_INFO } from "../data/injuries";
 import type { PickState } from "./types";
+
+// Players who can't play a meaningful chunk of the season (season-ending injury, or the
+// commissioner's-exempt/suspended list — anything out more than half the year) are NOT counted
+// as "best available" when grading, so a team is never dinged for correctly passing on someone
+// who can't help them. (They can still be graded as a reach if a team actually drafts one.)
+function isRosterable(id: string): boolean {
+  const inj = INJURY_INFO[id];
+  return !(inj && inj.risk === "long_out" && inj.gamesOut > 8);
+}
 
 export type PickLabel = "best" | "solid" | "reach" | "bad" | "ungraded";
 
@@ -34,7 +44,7 @@ export interface TeamReview {
 }
 
 const RANK_BY_ID = new Map(PLAYERS.map((p, i) => [p.id, { rank: i + 1, tier: p.tier, position: p.position, name: p.name }]));
-const SKILL_POOL = PLAYERS.filter((p) => p.position !== "K" && p.position !== "DST");
+const SKILL_POOL = PLAYERS.filter((p) => p.position !== "K" && p.position !== "DST" && isRosterable(p.id));
 
 function letterGrade(avgGap: number | null): string {
   if (avgGap == null) return "NA";

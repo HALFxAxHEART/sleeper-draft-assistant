@@ -42,7 +42,7 @@ export const INJURY_INFO: Record<string, InjuryInfo> = {
   [playerId("Tee Higgins", "WR")]: entry("prone", 0, "Recurring hamstring injuries in 2023-2024; dealt with concussions in 2025"),
 
   [playerId("Lamar Jackson", "QB")]: entry("prone", 0, "Missed 4 games in 2025 with hamstring, knee, and back issues"),
-  [playerId("Josh Jacobs", "RB")]: entry("prone", 0, "Minor camp groin injury; also facing a possible NFL suspension over a May arrest"),
+  [playerId("Josh Jacobs", "RB")]: entry("long_out", 17, "On the commissioner's exempt list — not eligible to play; treat as undraftable for 2026"),
   [playerId("Javonte Williams", "RB")]: entry("prone", 0, "2022 torn ACL/LCL/PLC; recurring soft-tissue issues since"),
   [playerId("Ladd McConkey", "WR")]: entry("prone", 0, "Hip, shoulder, knee, and toe injuries in 2025 plus recurring hamstring strains"),
   [playerId("Garrett Wilson", "WR")]: entry("prone", 0, "Missed most of 2025 with a knee injury; now fully cleared"),
