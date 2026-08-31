@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { loadArchive, removeDraft, type ArchivedDraft } from "../lib/archive";
 import { reviewDraft, type PickLabel } from "../lib/review";
+import { suggestTrades } from "../lib/trades";
 import { PosText } from "./PosText";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -25,6 +26,8 @@ export function DraftReview() {
   const sorted = useMemo(() => [...archive].sort((a, b) => b.savedAt - a.savedAt), [archive]);
   const selected = sorted.find((d) => d.draftId === selectedId) ?? sorted[0] ?? null;
   const teams = useMemo(() => (selected ? reviewDraft(selected) : []), [selected]);
+  const trades = useMemo(() => (selected ? suggestTrades(selected) : []), [selected]);
+  const hasMyTeam = teams.some((t) => t.isMine);
 
   function refresh() {
     setArchive(loadArchive());
@@ -80,6 +83,40 @@ export function DraftReview() {
             </div>
             {selected.status !== "complete" && (
               <div className="scarcity">Draft still in progress — this is the review of picks made so far, updating live.</div>
+            )}
+
+            {hasMyTeam && (
+              <div className="trade-ideas">
+                <h3>Trade ideas to improve your team</h3>
+                {trades.length > 0 ? (
+                  <div className="trade-list">
+                    {trades.map((t, i) => (
+                      <div key={i} className="trade-card">
+                        <div className="trade-swap">
+                          <span className="trade-give">
+                            <span className="trade-arrow">▲ give</span> {t.give.name}{" "}
+                            <span className="muted">
+                              <PosText position={t.give.position} /> #{t.give.rank}
+                            </span>
+                          </span>
+                          <span className="trade-get">
+                            <span className="trade-arrow get">▼ get</span> {t.get.name}{" "}
+                            <span className="muted">
+                              <PosText position={t.get.position} /> #{t.get.rank}
+                            </span>
+                            <span className="trade-partner"> from {t.partnerName}</span>
+                          </span>
+                        </div>
+                        <div className="trade-why">{t.rationale}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="muted trade-none">
+                    No clear win-win trades right now — your roster is reasonably balanced, or no other team's surplus lines up with your needs. (Trade ideas need a full draft with every team's picks, i.e. a live Sleeper sync.)
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="team-grades">

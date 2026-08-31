@@ -1236,6 +1236,61 @@ button {
   font-size: 18px;
 }
 
+/* Trade ideas */
+.trade-ideas {
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.trade-ideas h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--accent-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.trade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.trade-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.trade-swap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.trade-arrow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--danger);
+  margin-right: 4px;
+}
+.trade-arrow.get {
+  color: var(--ok);
+}
+.trade-partner {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.trade-why {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.trade-none {
+  font-size: 13px;
+}
+
 .team-grades {
   display: flex;
   flex-direction: column;
