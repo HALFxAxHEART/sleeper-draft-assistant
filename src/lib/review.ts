@@ -61,35 +61,54 @@ export interface GradeResult {
   note: string;
 }
 
+// How much the cross-position "best player on the whole board" gap counts. We grade a pick
+// mostly on POSITIONAL value — the best player still available AT THE PICK'S OWN POSITION —
+// because a drafter who skips a higher-ranked QB to take the best RB on the board usually did
+// it on purpose (waiting on QB, front-loading RB). Grading that as a "reach" just because a QB
+// outranked the RB is wrong. The overall-best-on-board gap still counts a little, so ignoring a
+// vastly superior player isn't totally free, but it's deliberately a minor nudge — not the main
+// signal. Bump this toward 1.0 to weight "best on the whole board" more; toward 0 to grade on
+// pure positional value.
+const OVERALL_GAP_WEIGHT = 0.25;
+
 // Shared by reviewDraft (archived Sleeper-synced picks, graded after the fact) and
 // gradeLivePick (your own manual picks, graded the instant you mark someone "mine") —
-// same gap-to-best-available thresholds either way, so the two views never disagree.
+// same thresholds either way, so the two views never disagree. `bestAtPosition` is the best
+// player still available at the pick's OWN position (the primary yardstick); `bestOverallRank`
+// is the rank of the best skill player left anywhere (a light secondary nudge).
 function gradeAgainstBest(
   isSkillPosition: boolean,
   rank: number | null,
-  bestAvailable: { name: string; rank: number; tier: number } | null,
+  bestAtPosition: { name: string; rank: number; tier: number; position: string } | null,
+  bestOverallRank: number | null,
 ): GradeResult {
   if (!isSkillPosition) {
     return { label: "solid", gap: null, note: "Depth/streaming pick — not graded against the skill-position board." };
   }
-  if (rank == null || !bestAvailable) {
+  if (rank == null || !bestAtPosition) {
     return { label: "ungraded", gap: null, note: "Not in our ranked board — no grade available." };
   }
-  const gap = Math.max(0, rank - bestAvailable.rank);
+  const pos = bestAtPosition.position;
+  const positionalGap = Math.max(0, rank - bestAtPosition.rank);
+  const overallGap = bestOverallRank != null ? Math.max(0, rank - bestOverallRank) : 0;
+  const gap = Math.round(positionalGap + OVERALL_GAP_WEIGHT * overallGap);
+
+  // Taking the best player left at your position is a fine pick by definition — never grade it
+  // worse than "solid" no matter what other positions had on the board.
+  if (positionalGap === 0) {
+    const label: PickLabel = gap <= 4 ? "best" : "solid";
+    return { label, gap, note: `Took the best ${pos} on the board.` };
+  }
   if (gap <= 4) {
-    return {
-      label: "best",
-      gap,
-      note: gap === 0 ? "Took the best player on the board." : `Right there with the best available (${bestAvailable.name}, Tier ${bestAvailable.tier}).`,
-    };
+    return { label: "best", gap, note: `Great value — right there with the best ${pos} available (${bestAtPosition.name}, Tier ${bestAtPosition.tier}).` };
   }
   if (gap <= 14) {
-    return { label: "solid", gap, note: `Solid — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was arguably a touch better.` };
+    return { label: "solid", gap, note: `Solid — ${bestAtPosition.name} (Tier ${bestAtPosition.tier}) was a slightly better ${pos}.` };
   }
   if (gap <= 30) {
-    return { label: "reach", gap, note: `Reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still on the board, better value.` };
+    return { label: "reach", gap, note: `Reach at ${pos} — ${bestAtPosition.name} (Tier ${bestAtPosition.tier}) was still on the board, better value.` };
   }
-  return { label: "bad", gap, note: `Big reach — ${bestAvailable.name} (Tier ${bestAvailable.tier}) was still available. That's a much stronger pick.` };
+  return { label: "bad", gap, note: `Big reach at ${pos} — ${bestAtPosition.name} (Tier ${bestAtPosition.tier}) was still available, a much stronger pick.` };
 }
 
 // Grades one of YOUR picks the instant it happens, using the board state from just
@@ -98,15 +117,19 @@ export function gradeLivePick(playerId: string, priorPickStates: Record<string, 
   const info = RANK_BY_ID.get(playerId);
   const isSkillPosition = info ? info.position !== "K" && info.position !== "DST" : true;
 
-  let bestAvailable: { name: string; rank: number; tier: number } | null = null;
-  if (isSkillPosition) {
-    const best = SKILL_POOL.find((p) => p.id !== playerId && (priorPickStates[p.id] ?? "available") === "available");
-    if (best) {
-      const bestInfo = RANK_BY_ID.get(best.id)!;
-      bestAvailable = { name: best.name, rank: bestInfo.rank, tier: bestInfo.tier };
+  let bestAtPosition: { name: string; rank: number; tier: number; position: string } | null = null;
+  let bestOverallRank: number | null = null;
+  if (isSkillPosition && info) {
+    const isOpen = (id: string) => id !== playerId && (priorPickStates[id] ?? "available") === "available";
+    const bestPos = SKILL_POOL.find((p) => p.position === info.position && isOpen(p.id));
+    if (bestPos) {
+      const bestInfo = RANK_BY_ID.get(bestPos.id)!;
+      bestAtPosition = { name: bestPos.name, rank: bestInfo.rank, tier: bestInfo.tier, position: bestInfo.position };
     }
+    const bestAny = SKILL_POOL.find((p) => isOpen(p.id));
+    if (bestAny) bestOverallRank = RANK_BY_ID.get(bestAny.id)!.rank;
   }
-  return gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAvailable);
+  return gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAtPosition, bestOverallRank);
 }
 
 export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
@@ -118,18 +141,21 @@ export function reviewDraft(archived: ArchivedDraft): TeamReview[] {
     const info = pick.playerId ? RANK_BY_ID.get(pick.playerId) : undefined;
     const isSkillPosition = pick.position !== "K" && pick.position !== "DST";
 
-    let bestAvailable: PickGrade["bestAvailable"] = null;
+    let bestAtPosition: PickGrade["bestAvailable"] = null;
+    let bestOverallRank: number | null = null;
     if (isSkillPosition) {
-      const best = SKILL_POOL.find((p) => !takenSkill.has(p.id));
-      if (best) {
-        const bestInfo = RANK_BY_ID.get(best.id)!;
-        bestAvailable = { name: best.name, rank: bestInfo.rank, tier: best.tier, position: best.position };
+      const bestPos = SKILL_POOL.find((p) => p.position === pick.position && !takenSkill.has(p.id));
+      if (bestPos) {
+        const bestInfo = RANK_BY_ID.get(bestPos.id)!;
+        bestAtPosition = { name: bestPos.name, rank: bestInfo.rank, tier: bestPos.tier, position: bestPos.position };
       }
+      const bestAny = SKILL_POOL.find((p) => !takenSkill.has(p.id));
+      if (bestAny) bestOverallRank = RANK_BY_ID.get(bestAny.id)!.rank;
     }
 
-    const { label, gap, note } = gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAvailable);
+    const { label, gap, note } = gradeAgainstBest(isSkillPosition, info?.rank ?? null, bestAtPosition, bestOverallRank);
 
-    const grade: PickGrade = { pick, rank: info?.rank ?? null, tier: info?.tier ?? null, bestAvailable, gap, label, note };
+    const grade: PickGrade = { pick, rank: info?.rank ?? null, tier: info?.tier ?? null, bestAvailable: bestAtPosition, gap, label, note };
 
     if (!teams.has(pick.slot)) {
       teams.set(pick.slot, {

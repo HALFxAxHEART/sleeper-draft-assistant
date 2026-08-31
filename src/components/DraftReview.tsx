@@ -96,7 +96,7 @@ export function DraftReview() {
                     </span>
                   </div>
                   {team.avgGap != null && (
-                    <div className="team-avg muted">Avg. {team.avgGap.toFixed(1)} ranks below best available ({team.gradedCount} graded picks)</div>
+                    <div className="team-avg muted">Avg. {team.avgGap.toFixed(1)} value gap vs. best at position ({team.gradedCount} graded picks)</div>
                   )}
                   <div className="team-picks">
                     {team.picks.map((g) => (
