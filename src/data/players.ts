@@ -112,7 +112,6 @@ const RAW: Array<[string, Position, string, number]> = [
   ["Michael Wilson", "WR", "ARI", 6],
   ["Michael Pittman Jr.", "WR", "PIT", 6],
   ["RJ Harvey", "RB", "DEN", 6],
-  ["Chuba Hubbard", "RB", "CAR", 6], // downgraded — lost the Panthers' lead role to Dowdle, looks washed
   ["Brock Purdy", "QB", "SF", 4],
   ["Quentin Johnston", "WR", "LAC", 6],
   ["Kyle Monangai", "RB", "CHI", 6],
@@ -146,6 +145,7 @@ const RAW: Array<[string, Position, string, number]> = [
   ["Xavier Worthy", "WR", "KC", 7],
   ["Tyler Shough", "QB", "NO", 5],
   ["Tyrone Tracy Jr.", "RB", "NYG", 7],
+  ["Chuba Hubbard", "RB", "CAR", 7], // downgraded further — lost the Panthers' lead role to Dowdle, washed
   ["Chris Rodriguez Jr.", "RB", "JAC", 7],
   ["Khalil Shakir", "WR", "BUF", 7],
   ["Jalen Coker", "WR", "CAR", 7],
