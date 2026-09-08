@@ -442,7 +442,9 @@ button {
 
 .pick-primary {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  /* Name column has a real floor (not 0) so it can't collapse to near-nothing and force
+     character-by-character wrapping when the card is narrow — it wraps to 2 lines instead. */
+  grid-template-columns: auto minmax(90px, 1fr) auto;
   align-items: center;
   column-gap: 8px;
   row-gap: 4px;
@@ -510,7 +512,7 @@ button {
   font-size: 12px;
   color: var(--text-dim);
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(90px, 1fr) auto;
   align-items: center;
   column-gap: 6px;
   row-gap: 2px;
@@ -1588,7 +1590,7 @@ button {
     margin-bottom: 5px;
   }
   .pick-primary {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(60px, 1fr);
     padding: 5px;
     gap: 4px;
     row-gap: 3px;
@@ -1597,7 +1599,7 @@ button {
     grid-column: 1 / -1;
   }
   .alt-chip {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(60px, 1fr);
     font-size: 10px;
     padding: 3px 4px;
   }
