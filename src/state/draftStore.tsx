@@ -6,7 +6,7 @@ import { gradeLivePick, type GradeResult } from "../lib/review";
 // Bumped v1 -> v2 for the 12-team / single-FLEX default change: discards any stale saved
 // config (e.g. a 2-FLEX roster left over from the old team-count rule) so everyone loads the
 // corrected defaults. Saved past-draft reviews live under a separate archive key, untouched.
-const STORAGE_KEY = "sleeper-draft-assistant/v4";
+const STORAGE_KEY = "sleeper-draft-assistant/v5";
 
 interface State {
   settings: DraftSettings;
@@ -42,8 +42,12 @@ function load(): State {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      // `roster` is deep-merged (not just spread) so adding a new RosterSlots field later
+      // (like IR/SUPERFLEX just did) can't leave it `undefined` in an old saved settings
+      // object and silently corrupt totalRounds()/round math for existing users.
+      const defaults = defaultSettings();
       return {
-        settings: { ...defaultSettings(), ...parsed.settings },
+        settings: { ...defaults, ...parsed.settings, roster: { ...defaults.roster, ...parsed.settings?.roster } },
         pickStates: parsed.pickStates ?? {},
         minePickOrder: parsed.minePickOrder ?? [],
         pickGrades: parsed.pickGrades ?? {},

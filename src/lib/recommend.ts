@@ -4,6 +4,7 @@ import { overallPickForRound, roundForOverallPick, totalRounds } from "./types";
 import { TEAM_CONTEXT } from "../data/teams";
 import { INJURY_INFO } from "../data/injuries";
 import { RED_ZONE_SHARE } from "../data/redzone";
+import { PLAYER_STATS } from "../data/stats";
 
 export interface BoardPlayer extends Player {
   overallRank: number;
@@ -78,8 +79,23 @@ function tePremiumBonus(p: BoardPlayer): number {
   return TE_PREMIUM_BY_TIER[p.tier] ?? 1;
 }
 
-export function effectiveRank(p: BoardPlayer): number {
-  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p) - tePremiumBonus(p);
+// In a superflex/2QB league, a 2nd (or 3rd) startable QB has real, big value — you need
+// multiple, and QB is generally the highest-scoring position per game. Weight it directly by
+// actual 2025 PPG (real points, not a tier guess): only QBs clearly better than a replacement-
+// level streamer get boosted, and the better they scored, the higher they get pushed — exactly
+// "if they receive more points they should be pushed higher." Only applies when the league
+// actually has a superflex slot; otherwise 0, same as today.
+const SUPERFLEX_QB_BASELINE_PPG = 17;
+const SUPERFLEX_QB_MULTIPLIER = 3;
+function superflexBonus(p: BoardPlayer, hasSuperflex: boolean): number {
+  if (!hasSuperflex || p.position !== "QB") return 0;
+  const stats = PLAYER_STATS[p.id];
+  if (!stats) return 0;
+  return Math.max(0, stats.ppg - SUPERFLEX_QB_BASELINE_PPG) * SUPERFLEX_QB_MULTIPLIER;
+}
+
+export function effectiveRank(p: BoardPlayer, hasSuperflex = false): number {
+  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p) - tePremiumBonus(p) - superflexBonus(p, hasSuperflex);
 }
 
 // A player who can't play a meaningful chunk of the season (season-ending injury, or the
@@ -105,8 +121,8 @@ export function redZoneBadgeInfo(p: BoardPlayer): { pct: number; note: string; s
 // outside it, the underlying rank (tier, injury, red-zone share) still wins outright.
 const RB_PREFERENCE_WINDOW = 3;
 
-export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
-  const sorted = [...players].sort((a, b) => effectiveRank(a) - effectiveRank(b));
+export function byEffectiveRank(players: BoardPlayer[], hasSuperflex = false): BoardPlayer[] {
+  const sorted = [...players].sort((a, b) => effectiveRank(a, hasSuperflex) - effectiveRank(b, hasSuperflex));
 
   // Bubble each RB up past any immediately preceding WR(s) that are within the toss-up
   // window of THAT RB specifically (not chained through intermediate swaps) — so a close
@@ -118,7 +134,7 @@ export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
       j > 0 &&
       sorted[j].position === "RB" &&
       sorted[j - 1].position === "WR" &&
-      effectiveRank(sorted[j]) - effectiveRank(sorted[j - 1]) <= RB_PREFERENCE_WINDOW
+      effectiveRank(sorted[j], hasSuperflex) - effectiveRank(sorted[j - 1], hasSuperflex) <= RB_PREFERENCE_WINDOW
     ) {
       [sorted[j - 1], sorted[j]] = [sorted[j], sorted[j - 1]];
       j--;
@@ -131,6 +147,7 @@ export function byEffectiveRank(players: BoardPlayer[]): BoardPlayer[] {
 function slotMatches(slot: StrategySlot, position: Position): boolean {
   if (slot === "BEST") return true;
   if (slot === "FLEX") return position === "RB" || position === "WR" || position === "TE";
+  if (slot === "SUPERFLEX") return position === "QB" || position === "RB" || position === "WR" || position === "TE";
   return slot === position;
 }
 
@@ -162,8 +179,8 @@ export interface TopByPositionEntry {
 
 // Best available player at each position right now, independent of round/strategy — a
 // quick "who's the best X left" reference regardless of what you're actually targeting.
-export function topAvailableByPosition(board: BoardPlayer[]): TopByPositionEntry[] {
-  const ranked = byEffectiveRank(board.filter((p) => p.state === "available" && isRosterable(p)));
+export function topAvailableByPosition(board: BoardPlayer[], hasSuperflex = false): TopByPositionEntry[] {
+  const ranked = byEffectiveRank(board.filter((p) => p.state === "available" && isRosterable(p)), hasSuperflex);
   const positions: Position[] = ["QB", "RB", "WR", "TE", "K", "DST"];
   const entries: TopByPositionEntry[] = positions.map((pos) => ({
     label: pos,
@@ -171,6 +188,10 @@ export function topAvailableByPosition(board: BoardPlayer[]): TopByPositionEntry
   }));
   const flexPlayer = ranked.find((p) => p.position === "RB" || p.position === "WR" || p.position === "TE") ?? null;
   entries.splice(4, 0, { label: "FLEX", player: flexPlayer });
+  if (hasSuperflex) {
+    const sflexPlayer = ranked.find((p) => p.position === "QB" || p.position === "RB" || p.position === "WR" || p.position === "TE") ?? null;
+    entries.splice(5, 0, { label: "SFLEX", player: sflexPlayer });
+  }
   return entries;
 }
 
@@ -195,6 +216,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
   const { teams, slot } = settings;
   const rounds = totalRounds(settings.roster);
   const totalPicks = rounds * teams;
+  const hasSuperflex = settings.roster.SUPERFLEX > 0;
 
   // We don't know which overall slot each real pick filled, only how many have happened —
   // that's enough to know which overall pick number comes next.
@@ -214,7 +236,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     const round = roundForOverallPick(overall, teams);
     const isMyPick = overall === overallPickForRound(round, slot, teams);
     const available = currentPool();
-    const ranked = byEffectiveRank(available);
+    const ranked = byEffectiveRank(available, hasSuperflex);
 
     if (!isMyPick) {
       const takenByOther = ranked[0];
@@ -224,14 +246,16 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
 
     const desiredSlot = settings.strategy[round - 1] ?? "BEST";
 
-    // A 2nd/3rd QB has near-zero standalone value once your starter(s) are rostered —
-    // unlike RB/WR/TE, which stay useful as bench/flex depth. So once roster.QB is filled,
-    // never auto-suggest another QB as the primary pick — not even if a round's strategy
-    // is explicitly set to "QB" (that just falls back to best-available-non-QB instead).
-    // This only steers the PRIMARY suggestion — a good QB still shows up in the alternates
-    // list below, it just isn't auto-picked or forced on you.
+    // A 2nd/3rd QB has near-zero standalone value once your starter QB slot(s) are rostered —
+    // unlike RB/WR/TE, which stay useful as bench/flex depth. "Slot(s)" includes SUPERFLEX,
+    // since that can hold a QB too — a superflex league genuinely wants 2 startable QBs, so
+    // saturation shouldn't kick in after just 1. Once truly saturated, never auto-suggest
+    // another QB as the primary pick — not even if a round's strategy is explicitly "QB"
+    // (falls back to best-available-non-QB instead). Only steers the PRIMARY suggestion — a
+    // good QB still shows up in the alternates list below, it just isn't auto-picked.
     const myQBCount = myPlayers.filter((p) => p.position === "QB").length;
-    const qbSaturated = myQBCount >= settings.roster.QB;
+    const qbCapacity = settings.roster.QB + settings.roster.SUPERFLEX;
+    const qbSaturated = myQBCount >= qbCapacity;
     const primaryCandidates = qbSaturated && ranked.some((p) => p.position !== "QB") ? ranked.filter((p) => p.position !== "QB") : ranked;
 
     const matching = primaryCandidates.filter((p) => slotMatches(desiredSlot, p.position));
@@ -250,7 +274,8 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
 
     let scarcityWarning: string | null = null;
     if (primary && desiredSlot !== "BEST") {
-      const positionsToCheck: Position[] = desiredSlot === "FLEX" ? ["RB", "WR", "TE"] : [desiredSlot as Position];
+      const positionsToCheck: Position[] =
+        desiredSlot === "FLEX" ? ["RB", "WR", "TE"] : desiredSlot === "SUPERFLEX" ? ["QB", "RB", "WR", "TE"] : [desiredSlot as Position];
       for (const pos of positionsToCheck) {
         const remainingInTier = available.filter((p) => p.position === pos && p.tier === primary.tier).length;
         if (remainingInTier <= 2) {

@@ -9,9 +9,11 @@ const ROSTER_FIELDS: Array<{ key: keyof RosterSlots; label: string }> = [
   { key: "WR", label: "WR" },
   { key: "TE", label: "TE" },
   { key: "FLEX", label: "FLEX" },
+  { key: "SUPERFLEX", label: "S.FLEX" },
   { key: "K", label: "K" },
   { key: "DST", label: "DST" },
   { key: "BENCH", label: "Bench" },
+  { key: "IR", label: "IR" },
 ];
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {

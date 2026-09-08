@@ -17,11 +17,13 @@ function slotLabels(prefix: string, count: number): string[] {
 }
 
 const isFlexEligible = (pos: string) => pos === "RB" || pos === "WR" || pos === "TE";
+const isSuperflexEligible = (pos: string) => pos === "QB" || isFlexEligible(pos);
 
-// Fills starter/bench slots in the order you actually drafted your players — exact
-// position match first, then FLEX (RB/WR/TE only), then bench. Same greedy assignment
-// any standard fantasy roster uses; it's not meant to be optimal, just what you'd see
-// on Sleeper's own roster page.
+// Fills starter/bench slots in the order you actually drafted your players — exact position
+// match first, then FLEX (RB/WR/TE), then SUPERFLEX (QB/RB/WR/TE) if the league has one, then
+// BENCH, then IR as a last resort. Same greedy assignment any standard fantasy roster uses;
+// it's not meant to be optimal, just what you'd see on Sleeper's own roster page. IR is tracked
+// as its own bucket (not folded into BENCH) so the panel labels it correctly.
 export function buildRosterSlots(
   board: BoardPlayer[],
   minePickOrder: string[],
@@ -41,9 +43,11 @@ export function buildRosterSlots(
   pushSlots("WR", roster.WR, "WR");
   pushSlots("TE", roster.TE, "TE");
   pushSlots("FLEX", roster.FLEX, "FLEX");
+  pushSlots("SFLEX", roster.SUPERFLEX, "SUPERFLEX");
   pushSlots("K", roster.K, "K");
   pushSlots("DST", roster.DST, "DST");
   pushSlots("BENCH", roster.BENCH, "BENCH");
+  pushSlots("IR", roster.IR, "IR");
 
   for (const playerId of minePickOrder) {
     const player = byId.get(playerId);
@@ -53,8 +57,14 @@ export function buildRosterSlots(
     if (!slot && isFlexEligible(player.position)) {
       slot = slots.find((s) => s.position === "FLEX" && !s.player);
     }
+    if (!slot && isSuperflexEligible(player.position)) {
+      slot = slots.find((s) => s.position === "SUPERFLEX" && !s.player);
+    }
     if (!slot) {
       slot = slots.find((s) => s.position === "BENCH" && !s.player);
+    }
+    if (!slot) {
+      slot = slots.find((s) => s.position === "IR" && !s.player);
     }
     if (slot) {
       slot.player = player;

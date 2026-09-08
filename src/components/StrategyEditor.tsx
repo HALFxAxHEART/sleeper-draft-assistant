@@ -2,7 +2,7 @@ import { useDraft } from "../state/draftStore";
 import type { StrategySlot } from "../lib/types";
 import { overallPickForRound } from "../lib/types";
 
-const OPTIONS: StrategySlot[] = ["BEST", "RB", "WR", "QB", "TE", "FLEX", "K", "DST"];
+const OPTIONS: StrategySlot[] = ["BEST", "RB", "WR", "QB", "TE", "FLEX", "SUPERFLEX", "K", "DST"];
 
 export function StrategyEditor() {
   const { state, dispatch } = useDraft();

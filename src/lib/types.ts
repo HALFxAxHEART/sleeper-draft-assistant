@@ -7,10 +7,12 @@ export interface RosterSlots {
   RB: number;
   WR: number;
   TE: number;
-  FLEX: number;
+  FLEX: number; // RB/WR/TE only
+  SUPERFLEX: number; // QB/RB/WR/TE — a real "superflex" slot, not just extra FLEX
   K: number;
   DST: number;
   BENCH: number;
+  IR: number; // reserve slots — tracked separately from BENCH so the roster panel labels them correctly
 }
 
 export const DEFAULT_ROSTER: RosterSlots = {
@@ -19,9 +21,11 @@ export const DEFAULT_ROSTER: RosterSlots = {
   WR: 2,
   TE: 1,
   FLEX: 2, // Michel's league runs 2 FLEX (16-round rosters)
+  SUPERFLEX: 0,
   K: 1,
   DST: 1,
   BENCH: 6,
+  IR: 0,
 };
 
 // FLEX count is a league setting the user controls (Michel's league runs 2), NOT something
@@ -31,7 +35,7 @@ export function flexForTeams(_teams: number): number {
   return DEFAULT_ROSTER.FLEX;
 }
 
-export type StrategySlot = Position | "FLEX" | "BEST";
+export type StrategySlot = Position | "FLEX" | "SUPERFLEX" | "BEST";
 
 export interface DraftSettings {
   teams: number;
@@ -46,8 +50,63 @@ export interface DraftSettings {
 
 export function totalRounds(roster: RosterSlots): number {
   return (
-    roster.QB + roster.RB + roster.WR + roster.TE + roster.FLEX + roster.K + roster.DST + roster.BENCH
+    roster.QB +
+    roster.RB +
+    roster.WR +
+    roster.TE +
+    roster.FLEX +
+    roster.SUPERFLEX +
+    roster.K +
+    roster.DST +
+    roster.BENCH +
+    roster.IR
   );
+}
+
+// Sleeper's own roster_positions codes -> our RosterSlots, so a synced league's real roster
+// shape (including IR count and a genuine superflex slot) replaces our guessed default instead
+// of everything extra getting lumped into BENCH.
+export function parseSleeperRosterPositions(positions: string[]): RosterSlots {
+  const roster: RosterSlots = { QB: 0, RB: 0, WR: 0, TE: 0, FLEX: 0, SUPERFLEX: 0, K: 0, DST: 0, BENCH: 0, IR: 0 };
+  for (const pos of positions) {
+    switch (pos) {
+      case "QB":
+        roster.QB++;
+        break;
+      case "RB":
+        roster.RB++;
+        break;
+      case "WR":
+        roster.WR++;
+        break;
+      case "TE":
+        roster.TE++;
+        break;
+      case "FLEX":
+      case "WRRB_FLEX":
+      case "REC_FLEX":
+        roster.FLEX++;
+        break;
+      case "SUPER_FLEX":
+        roster.SUPERFLEX++;
+        break;
+      case "K":
+        roster.K++;
+        break;
+      case "DEF":
+        roster.DST++;
+        break;
+      case "BN":
+        roster.BENCH++;
+        break;
+      case "IR":
+        roster.IR++;
+        break;
+      default:
+        break; // unrecognized/exotic position code (e.g. a taxi-squad marker) — skip silently
+    }
+  }
+  return roster;
 }
 
 export function scaleRoster(roster: RosterSlots, factor: number): RosterSlots {
@@ -58,29 +117,11 @@ export function scaleRoster(roster: RosterSlots, factor: number): RosterSlots {
   return out;
 }
 
-const DEFAULT_STRATEGY_CYCLE: StrategySlot[] = [
-  "RB",
-  "WR",
-  "RB",
-  "WR",
-  "WR",
-  "TE",
-  "BEST", // QB only if it's the best value left, not forced
-  "RB",
-  "FLEX",
-  "BEST", // same — QB competes on value here too
-  "TE",
-  "BEST",
-  "K",
-  "DST",
-];
-
+// Default is pure best-player-available for every round — no round is pre-committed to a
+// position. The user can still override any individual round to a specific position/FLEX/
+// SUPERFLEX in Settings, but nothing is forced by default.
 export function defaultStrategy(rounds: number): StrategySlot[] {
-  const out: StrategySlot[] = [];
-  for (let i = 0; i < rounds; i++) {
-    out.push(DEFAULT_STRATEGY_CYCLE[i] ?? "BEST");
-  }
-  return out;
+  return Array.from({ length: rounds }, () => "BEST");
 }
 
 export function defaultSettings(): DraftSettings {

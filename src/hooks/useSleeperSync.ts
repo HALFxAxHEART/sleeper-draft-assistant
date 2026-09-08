@@ -13,6 +13,7 @@ import {
 import { normalizeName } from "../lib/match";
 import { useDraft } from "../state/draftStore";
 import { upsertDraft, type ArchivedPick } from "../lib/archive";
+import { parseSleeperRosterPositions } from "../lib/types";
 
 const POLL_MS_IDLE = 2000; // before the draft starts, or once it's paused/complete
 const POLL_MS_ACTIVE = 200; // once picks are actually happening, sync as close to real-time as is reasonable
@@ -93,6 +94,12 @@ export function useSleeperSync() {
                 fetchLeagueRosters(draft.league_id),
               ]);
               if (league?.name) draftMeta.name = league.name;
+              // Pull the league's REAL roster shape (including IR count and a genuine superflex
+              // slot, if any) straight from Sleeper instead of guessing/doubling a default —
+              // this is what was showing IR slots mislabeled as generic "Bench" before.
+              if (league?.roster_positions?.length) {
+                dispatch({ type: "SET_ROSTER", roster: parseSleeperRosterPositions(league.roster_positions) });
+              }
               const nameByUser = new Map(users.map((u) => [u.user_id, u.metadata?.team_name || u.display_name || "Unnamed team"]));
               const nameByRoster = new Map<number, string>();
               for (const r of rosters) {
