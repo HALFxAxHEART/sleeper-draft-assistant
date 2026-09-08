@@ -5,6 +5,7 @@ import { TEAM_CONTEXT } from "../data/teams";
 import { INJURY_INFO } from "../data/injuries";
 import { RED_ZONE_SHARE } from "../data/redzone";
 import { PLAYER_STATS } from "../data/stats";
+import { PLAYER_VOLUME } from "../data/volume";
 
 export interface BoardPlayer extends Player {
   overallRank: number;
@@ -67,16 +68,23 @@ function redZoneBonus(p: BoardPlayer): number {
   return Math.min(REDZONE_CAP, Math.max(0, info.pct - baseline) * multiplier);
 }
 
-// Michel's league scoring gives an EXTRA point per reception to TEs only (so a TE catch is
-// worth 2, vs. 1 for every other position) — a real, meaningful value boost on top of standard
-// PPR, on top of the already-real red-zone bonus above. Scaled by tier as a proxy for target
-// volume (we don't have raw weekly reception counts to compute this exactly): the true
-// high-target pass-catching TEs (tier 1-2, e.g. Bowers/McBride) get real premium recognition
-// without leapfrogging the elite RB/WR tier outright — same "nudge, not override" philosophy.
-const TE_PREMIUM_BY_TIER: Record<number, number> = { 1: 10, 2: 7, 3: 4, 4: 2 };
-function tePremiumBonus(p: BoardPlayer): number {
-  if (p.position !== "TE") return 0;
-  return TE_PREMIUM_BY_TIER[p.tier] ?? 1;
+// A league scoring EXTRA points per TE reception (Sleeper's `bonus_rec_te`, auto-detected on
+// sync) is a real, meaningful value boost on top of standard PPR. Driven by REAL 2025 target
+// volume (src/data/volume.ts) rather than a tier guess: estimated receptions = targets × a
+// league-average TE catch rate, × the actual bonus-per-catch amount = real extra season points
+// from the bonus — the more of it a TE would actually earn, the higher they get pushed. A TE
+// outside our researched volume data (deeper bench additions) falls back to a small flat nudge
+// scaled by tier instead of 0, so the premium isn't just silently absent for them.
+const TE_PREMIUM_CATCH_RATE = 0.68;
+const TE_PREMIUM_SCALE = 0.2; // rank-slots per extra real fantasy point the bonus is worth
+const TE_PREMIUM_CAP = 25;
+const TE_PREMIUM_FALLBACK_BY_TIER: Record<number, number> = { 1: 8, 2: 6, 3: 4, 4: 2 };
+function tePremiumBonus(p: BoardPlayer, teReceptionBonus: number): number {
+  if (p.position !== "TE" || teReceptionBonus <= 0) return 0;
+  const vol = PLAYER_VOLUME[p.id];
+  if (!vol) return (TE_PREMIUM_FALLBACK_BY_TIER[p.tier] ?? 0) * teReceptionBonus;
+  const extraPoints = vol.targets * TE_PREMIUM_CATCH_RATE * teReceptionBonus;
+  return Math.min(TE_PREMIUM_CAP, extraPoints * TE_PREMIUM_SCALE);
 }
 
 // In a superflex/2QB league, a 2nd (or 3rd) startable QB has real, big value — you need
@@ -94,8 +102,23 @@ function superflexBonus(p: BoardPlayer, hasSuperflex: boolean): number {
   return Math.max(0, stats.ppg - SUPERFLEX_QB_BASELINE_PPG) * SUPERFLEX_QB_MULTIPLIER;
 }
 
-export function effectiveRank(p: BoardPlayer, hasSuperflex = false): number {
-  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p) - tePremiumBonus(p) - superflexBonus(p, hasSuperflex);
+// Bundles the league-specific context that shifts rankings, so adding a new one (like
+// teReceptionBonus) doesn't mean threading yet another positional parameter through every
+// caller. Everything defaults to "no adjustment" so callers that don't have settings handy
+// (e.g. a quick lookup) still get sane, standard-scoring behavior.
+export interface RankContext {
+  hasSuperflex?: boolean;
+  teReceptionBonus?: number;
+}
+
+export function effectiveRank(p: BoardPlayer, ctx: RankContext = {}): number {
+  return (
+    p.overallRank +
+    injuryPenalty(p.id) -
+    redZoneBonus(p) -
+    tePremiumBonus(p, ctx.teReceptionBonus ?? 0) -
+    superflexBonus(p, ctx.hasSuperflex ?? false)
+  );
 }
 
 // A player who can't play a meaningful chunk of the season (season-ending injury, or the
@@ -121,8 +144,8 @@ export function redZoneBadgeInfo(p: BoardPlayer): { pct: number; note: string; s
 // outside it, the underlying rank (tier, injury, red-zone share) still wins outright.
 const RB_PREFERENCE_WINDOW = 3;
 
-export function byEffectiveRank(players: BoardPlayer[], hasSuperflex = false): BoardPlayer[] {
-  const sorted = [...players].sort((a, b) => effectiveRank(a, hasSuperflex) - effectiveRank(b, hasSuperflex));
+export function byEffectiveRank(players: BoardPlayer[], ctx: RankContext = {}): BoardPlayer[] {
+  const sorted = [...players].sort((a, b) => effectiveRank(a, ctx) - effectiveRank(b, ctx));
 
   // Bubble each RB up past any immediately preceding WR(s) that are within the toss-up
   // window of THAT RB specifically (not chained through intermediate swaps) — so a close
@@ -134,7 +157,7 @@ export function byEffectiveRank(players: BoardPlayer[], hasSuperflex = false): B
       j > 0 &&
       sorted[j].position === "RB" &&
       sorted[j - 1].position === "WR" &&
-      effectiveRank(sorted[j], hasSuperflex) - effectiveRank(sorted[j - 1], hasSuperflex) <= RB_PREFERENCE_WINDOW
+      effectiveRank(sorted[j], ctx) - effectiveRank(sorted[j - 1], ctx) <= RB_PREFERENCE_WINDOW
     ) {
       [sorted[j - 1], sorted[j]] = [sorted[j], sorted[j - 1]];
       j--;
@@ -179,8 +202,8 @@ export interface TopByPositionEntry {
 
 // Best available player at each position right now, independent of round/strategy — a
 // quick "who's the best X left" reference regardless of what you're actually targeting.
-export function topAvailableByPosition(board: BoardPlayer[], hasSuperflex = false): TopByPositionEntry[] {
-  const ranked = byEffectiveRank(board.filter((p) => p.state === "available" && isRosterable(p)), hasSuperflex);
+export function topAvailableByPosition(board: BoardPlayer[], ctx: RankContext = {}): TopByPositionEntry[] {
+  const ranked = byEffectiveRank(board.filter((p) => p.state === "available" && isRosterable(p)), ctx);
   const positions: Position[] = ["QB", "RB", "WR", "TE", "K", "DST"];
   const entries: TopByPositionEntry[] = positions.map((pos) => ({
     label: pos,
@@ -188,7 +211,7 @@ export function topAvailableByPosition(board: BoardPlayer[], hasSuperflex = fals
   }));
   const flexPlayer = ranked.find((p) => p.position === "RB" || p.position === "WR" || p.position === "TE") ?? null;
   entries.splice(4, 0, { label: "FLEX", player: flexPlayer });
-  if (hasSuperflex) {
+  if (ctx.hasSuperflex) {
     const sflexPlayer = ranked.find((p) => p.position === "QB" || p.position === "RB" || p.position === "WR" || p.position === "TE") ?? null;
     entries.splice(5, 0, { label: "SFLEX", player: sflexPlayer });
   }
@@ -216,7 +239,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
   const { teams, slot } = settings;
   const rounds = totalRounds(settings.roster);
   const totalPicks = rounds * teams;
-  const hasSuperflex = settings.roster.SUPERFLEX > 0;
+  const ctx: RankContext = { hasSuperflex: settings.roster.SUPERFLEX > 0, teReceptionBonus: settings.teReceptionBonus };
 
   // We don't know which overall slot each real pick filled, only how many have happened —
   // that's enough to know which overall pick number comes next.
@@ -236,7 +259,7 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
     const round = roundForOverallPick(overall, teams);
     const isMyPick = overall === overallPickForRound(round, slot, teams);
     const available = currentPool();
-    const ranked = byEffectiveRank(available, hasSuperflex);
+    const ranked = byEffectiveRank(available, ctx);
 
     if (!isMyPick) {
       const takenByOther = ranked[0];

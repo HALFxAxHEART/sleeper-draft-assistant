@@ -17,6 +17,7 @@ export interface SleeperLeague {
   name: string;
   season: string;
   roster_positions?: string[]; // real roster shape — e.g. ["QB","RB","RB","WR","WR","FLEX","SUPER_FLEX","BN","BN","IR"]
+  scoring_settings?: Record<string, number>; // e.g. { rec: 1, bonus_rec_te: 1, pass_td: 4, ... }
 }
 
 export interface SleeperUser {

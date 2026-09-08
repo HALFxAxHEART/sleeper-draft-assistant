@@ -12,8 +12,9 @@ export function TopByPosition() {
   const { state, dispatch } = useDraft();
   const { open } = useDetail();
   const board = useMemo(() => buildBoard(PLAYERS, state.pickStates), [state.pickStates]);
-  const hasSuperflex = state.settings.roster.SUPERFLEX > 0;
-  const entries = useMemo(() => topAvailableByPosition(board, hasSuperflex), [board, hasSuperflex]);
+  const { roster, teReceptionBonus } = state.settings;
+  const ctx = useMemo(() => ({ hasSuperflex: roster.SUPERFLEX > 0, teReceptionBonus }), [roster.SUPERFLEX, teReceptionBonus]);
+  const entries = useMemo(() => topAvailableByPosition(board, ctx), [board, ctx]);
 
   return (
     <section className="top-by-pos">

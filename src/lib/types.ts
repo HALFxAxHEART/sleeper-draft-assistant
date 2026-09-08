@@ -43,6 +43,10 @@ export interface DraftSettings {
   roster: RosterSlots;
   doubles: boolean; // 2 managers sharing one team -> every roster slot doubled
   scoring: "PPR" | "Half PPR" | "Standard";
+  // Extra points per TE reception, auto-detected from a synced league's real scoring_settings
+  // (Sleeper's `bonus_rec_te`). 0 = no TE premium. Drives the TE ranking bonus dynamically —
+  // not hardcoded to any one league's rules.
+  teReceptionBonus: number;
   strategy: StrategySlot[]; // one entry per round, length == totalRounds()
   sleeperDraftId: string;
   sleeperUsername: string;
@@ -137,6 +141,9 @@ export function defaultSettings(): DraftSettings {
     roster,
     doubles,
     scoring: "PPR",
+    // Matches tonight's known league scoring as a starting point — auto-corrects to whatever
+    // a synced league's real scoring_settings say (including 0, for a league with no premium).
+    teReceptionBonus: 1,
     strategy: defaultStrategy(totalRounds(roster)),
     sleeperDraftId: "",
     sleeperUsername: "",
