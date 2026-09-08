@@ -465,9 +465,9 @@ button {
 .pick-primary .pname {
   font-weight: 600;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Full name always visible — wraps to a second line rather than truncating with "...". */
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 .pick-primary .pmeta {
   font-size: 12px;
@@ -526,9 +526,9 @@ button {
   color: var(--text);
   font-weight: 600;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Full name always visible — wraps to a second line rather than truncating with "...". */
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 .alt-meta {
   grid-column: 1 / -1;
