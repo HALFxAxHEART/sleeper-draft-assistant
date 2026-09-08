@@ -4,6 +4,7 @@ import { PLAYERS } from "../data/players";
 import { buildBoard, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
+import { VolumeBadge } from "./VolumeBadge";
 import { PpgBadge } from "./PpgBadge";
 import { useDetail } from "../state/detailStore";
 
@@ -59,6 +60,7 @@ export function MyQueue() {
                 <span className="row-badges queue-badges">
                   <PpgBadge player={p} />
                   <RedZoneBadge player={p} />
+                  <VolumeBadge player={p} />
                 </span>
               )}
             </div>

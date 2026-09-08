@@ -5,6 +5,7 @@ import { buildBoard, type BoardPlayer } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
+import { VolumeBadge } from "./VolumeBadge";
 import { PpgBadge } from "./PpgBadge";
 import { PosText } from "./PosText";
 import { useDetail } from "../state/detailStore";
@@ -78,6 +79,7 @@ export function PlayerBoard() {
               <span className="pmeta"><PosText position={p.position} /> · {p.team}</span>
               <PpgBadge player={p} />
               <RedZoneBadge player={p} />
+              <VolumeBadge player={p} />
               <InjuryBadge id={p.id} />
             </span>
           </button>

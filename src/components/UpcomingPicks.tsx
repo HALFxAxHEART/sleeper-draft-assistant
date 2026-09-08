@@ -5,6 +5,7 @@ import { buildBoard, recommendAllRounds, type BoardPlayer } from "../lib/recomme
 import { TierBadge } from "./TierBadge";
 import { InjuryBadge } from "./InjuryBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
+import { VolumeBadge } from "./VolumeBadge";
 import { PpgBadge } from "./PpgBadge";
 import { PosText } from "./PosText";
 import { ByeSummary } from "./ByeSummary";
@@ -39,6 +40,7 @@ function AlternatesList({ alternates, onPick }: { alternates: BoardPlayer[]; onP
           <span className="row-badges">
             <PpgBadge player={alt} />
             <RedZoneBadge player={alt} />
+            <VolumeBadge player={alt} />
             <InjuryBadge id={alt.id} />
           </span>
           <span className="muted alt-meta"><PosText position={alt.position} /> · {alt.team}</span>
@@ -104,6 +106,7 @@ export function UpcomingPicks() {
                 <span className="row-badges">
                   <PpgBadge player={rec.primary} />
                   <RedZoneBadge player={rec.primary} />
+                  <VolumeBadge player={rec.primary} />
                   <InjuryBadge id={rec.primary.id} />
                 </span>
                 <span className="pmeta"><PosText position={rec.primary.position} /> · {rec.primary.team}</span>

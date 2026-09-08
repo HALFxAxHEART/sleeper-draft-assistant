@@ -4,6 +4,7 @@ import { PLAYERS } from "../data/players";
 import { buildBoard, topAvailableByPosition } from "../lib/recommend";
 import { TierBadge } from "./TierBadge";
 import { RedZoneBadge } from "./RedZoneBadge";
+import { VolumeBadge } from "./VolumeBadge";
 import { PpgBadge } from "./PpgBadge";
 import { useDetail } from "../state/detailStore";
 
@@ -38,6 +39,7 @@ export function TopByPosition() {
               <span className="row-badges">
                 <PpgBadge player={e.player} />
                 <RedZoneBadge player={e.player} />
+                <VolumeBadge player={e.player} />
                 <span className="tbp-team muted">{e.player.team}</span>
               </span>
             </button>

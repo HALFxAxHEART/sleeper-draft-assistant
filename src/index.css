@@ -634,6 +634,21 @@ button {
   color: var(--ok);
 }
 
+/* Touches/targets volume badge — sits right next to the red-zone badge everywhere it's shown */
+.volume-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 6px;
+  flex-shrink: 0;
+  cursor: help;
+  background: var(--panel-2);
+  color: var(--text-dim);
+}
+
 /* Avg points/game badge — sits right next to the red-zone badge everywhere it's shown */
 .ppg-badge {
   display: inline-flex;
