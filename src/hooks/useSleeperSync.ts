@@ -100,13 +100,14 @@ export function useSleeperSync() {
               if (league?.roster_positions?.length) {
                 dispatch({ type: "SET_ROSTER", roster: parseSleeperRosterPositions(league.roster_positions) });
               }
-              // Auto-detect the league's real scoring quirks that actually change rankings —
-              // right now just the TE reception premium (Sleeper's `bonus_rec_te`). 0 if the
-              // league doesn't have one, so this correctly turns the premium OFF for a league
-              // that doesn't use it, not just on for ones that do.
+              // Auto-detect the league's real scoring quirks that actually change rankings:
+              // the TE reception premium (`bonus_rec_te`) and the base PPR value (`rec`). Both
+              // default sensibly (0 premium, 1 = full PPR matching our board's own baseline) so
+              // a league without these quirks correctly gets NO adjustment, not a leftover one.
               if (league?.scoring_settings) {
                 const teReceptionBonus = league.scoring_settings.bonus_rec_te ?? 0;
-                dispatch({ type: "SET_SETTINGS", settings: { teReceptionBonus } });
+                const pprValue = league.scoring_settings.rec ?? 1;
+                dispatch({ type: "SET_SETTINGS", settings: { teReceptionBonus, pprValue } });
               }
               const nameByUser = new Map(users.map((u) => [u.user_id, u.metadata?.team_name || u.display_name || "Unnamed team"]));
               const nameByRoster = new Map<number, string>();

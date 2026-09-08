@@ -47,6 +47,11 @@ export interface DraftSettings {
   // (Sleeper's `bonus_rec_te`). 0 = no TE premium. Drives the TE ranking bonus dynamically —
   // not hardcoded to any one league's rules.
   teReceptionBonus: number;
+  // Points per reception (Sleeper's `rec`), auto-detected the same way. Our board's own
+  // consensus order assumes full PPR (1), so this only shifts rankings when a synced league
+  // actually differs — half-PPR (0.5) or standard (0) both take real value off target-heavy
+  // players relative to bell-cow rushers.
+  pprValue: number;
   strategy: StrategySlot[]; // one entry per round, length == totalRounds()
   sleeperDraftId: string;
   sleeperUsername: string;
@@ -144,6 +149,7 @@ export function defaultSettings(): DraftSettings {
     // Matches tonight's known league scoring as a starting point — auto-corrects to whatever
     // a synced league's real scoring_settings say (including 0, for a league with no premium).
     teReceptionBonus: 1,
+    pprValue: 1, // full PPR, matching tonight's league and our board's own assumed baseline
     strategy: defaultStrategy(totalRounds(roster)),
     sleeperDraftId: "",
     sleeperUsername: "",

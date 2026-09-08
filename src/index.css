@@ -442,13 +442,18 @@ button {
 
 .pick-primary {
   display: grid;
-  /* Name column has a real floor (not 0) so it can't collapse to near-nothing and force
-     character-by-character wrapping when the card is narrow — it wraps to 2 lines instead. */
-  grid-template-columns: auto minmax(90px, 1fr) auto;
+  /* Only 2 columns now (badge column dropped — see .pick-primary .row-badges below): a 3rd
+     "auto" track sized to badge-cluster content could grow past the card's actual width
+     since grid doesn't shrink auto tracks below their max-content by default, which is
+     exactly what was pushing badges outside the box. Name column has a real floor (not 0)
+     so it can't collapse to near-nothing and force character-by-character wrapping when
+     the card is narrow — it wraps to 2 lines instead. */
+  grid-template-columns: auto minmax(90px, 1fr);
   align-items: center;
   column-gap: 8px;
   row-gap: 4px;
   width: 100%;
+  max-width: 100%;
   background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -456,6 +461,7 @@ button {
   cursor: pointer;
   text-align: left;
   color: var(--text);
+  overflow: hidden;
 }
 .pick-primary:hover {
   border-color: var(--accent);
@@ -470,6 +476,9 @@ button {
   /* Full name always visible — wraps to a second line rather than truncating with "...". */
   white-space: normal;
   overflow-wrap: break-word;
+}
+.pick-primary .row-badges {
+  grid-column: 1 / -1;
 }
 .pick-primary .pmeta {
   font-size: 12px;
@@ -512,7 +521,8 @@ button {
   font-size: 12px;
   color: var(--text-dim);
   display: grid;
-  grid-template-columns: auto minmax(90px, 1fr) auto;
+  /* 2 columns, not 3 — see .pick-primary above for why a 3rd "auto" badge column overflows. */
+  grid-template-columns: auto minmax(90px, 1fr);
   align-items: center;
   column-gap: 6px;
   row-gap: 2px;
@@ -523,6 +533,8 @@ button {
   cursor: pointer;
   text-align: left;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 .alt-name {
   color: var(--text);
@@ -531,6 +543,9 @@ button {
   /* Full name always visible — wraps to a second line rather than truncating with "...". */
   white-space: normal;
   overflow-wrap: break-word;
+}
+.alt-chip .row-badges {
+  grid-column: 1 / -1;
 }
 .alt-meta {
   grid-column: 1 / -1;

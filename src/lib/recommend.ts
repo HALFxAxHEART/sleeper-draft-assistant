@@ -87,6 +87,29 @@ function tePremiumBonus(p: BoardPlayer, teReceptionBonus: number): number {
   return Math.min(TE_PREMIUM_CAP, extraPoints * TE_PREMIUM_SCALE);
 }
 
+// General PPR-value adjustment (Sleeper's `rec`, auto-detected on sync) — our board's own
+// consensus order already assumes a full-PPR baseline (1 pt/catch), so this only kicks in
+// when a synced league is actually DIFFERENT from that (half-PPR = 0.5, standard = 0). Driven
+// by real target volume, same approach as the TE premium: a lower-than-1 rec value takes real
+// points away from target-heavy players (pass-catching RBs, WR/TE), which correctly makes
+// bell-cow rushing RBs relatively MORE valuable without needing to touch them directly — their
+// rushing-based value (red-zone bonus, consensus rank) is untouched, they just stop losing
+// ground to the reception bonus other players are also losing. A >1 "PPR" value (rare, but
+// some leagues do run 1.5) works the same way in reverse.
+const PPR_BASELINE = 1;
+const PPR_CATCH_RATE = 0.65;
+const PPR_SCALE = 0.15;
+const PPR_CAP = 15;
+function pprAdjustment(p: BoardPlayer, pprValue: number): number {
+  if (p.position !== "RB" && p.position !== "WR" && p.position !== "TE") return 0;
+  if (pprValue === PPR_BASELINE) return 0;
+  const vol = PLAYER_VOLUME[p.id];
+  if (!vol) return 0;
+  const estReceptions = vol.targets * PPR_CATCH_RATE;
+  const extraPoints = estReceptions * (pprValue - PPR_BASELINE);
+  return Math.max(-PPR_CAP, Math.min(PPR_CAP, extraPoints * PPR_SCALE));
+}
+
 // In a superflex/2QB league, a 2nd (or 3rd) startable QB has real, big value — you need
 // multiple, and QB is generally the highest-scoring position per game. Weight it directly by
 // actual 2025 PPG (real points, not a tier guess): only QBs clearly better than a replacement-
@@ -109,6 +132,7 @@ function superflexBonus(p: BoardPlayer, hasSuperflex: boolean): number {
 export interface RankContext {
   hasSuperflex?: boolean;
   teReceptionBonus?: number;
+  pprValue?: number;
 }
 
 export function effectiveRank(p: BoardPlayer, ctx: RankContext = {}): number {
@@ -117,6 +141,7 @@ export function effectiveRank(p: BoardPlayer, ctx: RankContext = {}): number {
     injuryPenalty(p.id) -
     redZoneBonus(p) -
     tePremiumBonus(p, ctx.teReceptionBonus ?? 0) -
+    pprAdjustment(p, ctx.pprValue ?? PPR_BASELINE) -
     superflexBonus(p, ctx.hasSuperflex ?? false)
   );
 }
@@ -239,7 +264,11 @@ export function recommendAllRounds(board: BoardPlayer[], settings: DraftSettings
   const { teams, slot } = settings;
   const rounds = totalRounds(settings.roster);
   const totalPicks = rounds * teams;
-  const ctx: RankContext = { hasSuperflex: settings.roster.SUPERFLEX > 0, teReceptionBonus: settings.teReceptionBonus };
+  const ctx: RankContext = {
+    hasSuperflex: settings.roster.SUPERFLEX > 0,
+    teReceptionBonus: settings.teReceptionBonus,
+    pprValue: settings.pprValue,
+  };
 
   // We don't know which overall slot each real pick filled, only how many have happened —
   // that's enough to know which overall pick number comes next.
