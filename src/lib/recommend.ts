@@ -66,8 +66,20 @@ function redZoneBonus(p: BoardPlayer): number {
   return Math.min(REDZONE_CAP, Math.max(0, info.pct - baseline) * multiplier);
 }
 
+// Michel's league scoring gives an EXTRA point per reception to TEs only (so a TE catch is
+// worth 2, vs. 1 for every other position) — a real, meaningful value boost on top of standard
+// PPR, on top of the already-real red-zone bonus above. Scaled by tier as a proxy for target
+// volume (we don't have raw weekly reception counts to compute this exactly): the true
+// high-target pass-catching TEs (tier 1-2, e.g. Bowers/McBride) get real premium recognition
+// without leapfrogging the elite RB/WR tier outright — same "nudge, not override" philosophy.
+const TE_PREMIUM_BY_TIER: Record<number, number> = { 1: 10, 2: 7, 3: 4, 4: 2 };
+function tePremiumBonus(p: BoardPlayer): number {
+  if (p.position !== "TE") return 0;
+  return TE_PREMIUM_BY_TIER[p.tier] ?? 1;
+}
+
 export function effectiveRank(p: BoardPlayer): number {
-  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p);
+  return p.overallRank + injuryPenalty(p.id) - redZoneBonus(p) - tePremiumBonus(p);
 }
 
 // A player who can't play a meaningful chunk of the season (season-ending injury, or the

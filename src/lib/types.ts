@@ -84,14 +84,17 @@ export function defaultStrategy(rounds: number): StrategySlot[] {
 }
 
 export function defaultSettings(): DraftSettings {
-  const roster = DEFAULT_ROSTER;
+  // Tonight's draft is a "doubles" league (2 managers per team, every roster slot doubled) —
+  // defaulting it on so the roster/round count is right from a fresh load.
+  const doubles = true;
+  const roster = doubles ? scaleRoster(DEFAULT_ROSTER, 2) : DEFAULT_ROSTER;
   return {
     // Michel's league is an 8-team, 2-FLEX redraft and he drafts 8th; teams/slot auto-correct
     // to whatever the Sleeper draft reports once he connects, so this is just the starting point.
     teams: 8,
     slot: 8,
     roster,
-    doubles: false,
+    doubles,
     scoring: "PPR",
     strategy: defaultStrategy(totalRounds(roster)),
     sleeperDraftId: "",
