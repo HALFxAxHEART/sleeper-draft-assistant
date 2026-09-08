@@ -342,12 +342,16 @@ button {
 }
 
 /* Shared trailing badge cluster — keeps badges lined up at a fixed spot on every row
-   instead of drifting sideways with each row's name length. */
+   instead of drifting sideways with each row's name length. Wraps onto multiple lines
+   instead of overflowing its box once there are more badges than fit on one line
+   (Tier/Ppg/RedZone/Volume/Injury can be 4-5 badges now, easily wider than a narrow card). */
 .row-badges {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Upcoming picks */
